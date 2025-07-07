@@ -2,18 +2,18 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item android:title="Home"
-        android:id="@+id/navSHome"
+        android:id="@+id/navHome"
         />
     <item android:title="Subjects"
-            android:id="@+id/navSSubjects"
-            android:icon="@drawable/ic_lock"
+            android:id="@+id/navSubjects"
+            android:icon="@drawable/ic_subjects"
         />
     <item android:title="Attendance"
-            android:id="@+id/navSAttendance"
-            android:icon="@drawable/ic_lock"
+            android:id="@+id/navAttendance"
+            android:icon="@drawable/ic_attendance"
         />
     <item android:title="Profile"
-           android:id="@+id/navSProfile"
+           android:id="@+id/navProfile"
            android:icon="@drawable/ic_profile"
         />
 
