@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <!-- Primary Colors -->
+    <color name="primary">#2196F3</color>
+    <color name="primary_dark">#1976D2</color>
+    <color name="primary_light">#BBDEFB</color>
+
+    <!-- Accent Colors -->
+    <color name="accent">#FF9800</color>
+    <color name="accent_dark">#F57C00</color>
+
+    <!-- Background Colors -->
+    <color name="background_light">#F5F5F5</color>
+    <color name="background_white">#FFFFFF</color>
+
+    <!-- Text Colors -->
+    <color name="text_primary">#212121</color>
+    <color name="text_secondary">#757575</color>
+    <color name="text_hint">#BDBDBD</color>
+
+    <!-- Input Colors -->
+    <color name="input_background">#FFFFFF</color>
+    <color name="input_border">#E0E0E0</color>
+    <color name="input_focus">#2196F3</color>
+
+    <!-- Button Colors -->
+    <color name="button_primary">#2196F3</color>
+    <color name="button_primary_pressed">#1976D2</color>
+    <color name="button_secondary">#FFFFFF</color>
+    <color name="button_secondary_pressed">#F5F5F5</color>
+
+
+</resources>
