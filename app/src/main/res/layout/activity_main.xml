@@ -23,10 +23,13 @@
         android:id="@+id/bottomNavigationBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:labelVisibilityMode="labeled"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:itemBackground="@drawable/nav_no_ripple"
         app:menu="@menu/navbar_admin"
         />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+

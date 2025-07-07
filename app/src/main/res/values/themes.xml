@@ -1,9 +1,16 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="Base.Theme.SmartTuitionManager" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <!-- Remove gray circle background on selected tab -->
+        <item name="bottomNavigationStyle">@style/NoIconCircleNavBar</item>
     </style>
 
     <style name="Theme.SmartTuitionManager" parent="Base.Theme.SmartTuitionManager" />
+
+    <!-- 🔵 Remove the default shape overlay from selected nav item -->
+    <style name="NoIconCircleNavBar" parent="Widget.Material3.BottomNavigationView">
+        <item name="itemShapeAppearanceOverlay">@style/NoShape</item>
+    </style>
+
+    <style name="NoShape" parent="" />
 </resources>

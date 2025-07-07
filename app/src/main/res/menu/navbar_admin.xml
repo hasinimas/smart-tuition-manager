@@ -2,19 +2,19 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item android:title="Home"
-            android:id="@+id/navAHome"
+            android:id="@+id/navHome"
             android:icon="@drawable/ic_home"
         />
     <item android:title="Users"
-            android:id="@+id/navAUsers"
-            android:icon="@drawable/ic_home"
+            android:id="@+id/navUsers"
+            android:icon="@drawable/ic_users"
         />
     <item android:title="Subjects"
-        android:id="@+id/navASubjects"
-        android:icon="@drawable/ic_home"
+        android:id="@+id/navSubjects"
+        android:icon="@drawable/ic_subjects"
         />
     <item android:title="Reports"
             android:id="@+id/navReports"
-            android:icon="@drawable/ic_home"
+            android:icon="@drawable/ic_report"
         />
 </menu>
