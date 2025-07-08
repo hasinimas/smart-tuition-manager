@@ -2,15 +2,16 @@ package com.example.smarttuitionmanager;
 
 import android.graphics.Typeface;
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.GridLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.GridLayout;
 import android.widget.TextView;
+import androidx.fragment.app.Fragment;
+
+import java.util.ArrayList;
 
 public class HomeFragment extends Fragment {
 
@@ -47,27 +48,35 @@ public class HomeFragment extends Fragment {
         return view;
     }
 
-    // Role-specific methods
-
     private void loadTeacherContent() {
         setWelcome("Welcome, Teacher");
 
-        setWelcome("Welcome, Teacher");
+        // Simulate dynamic stats data
+        ArrayList<Stat> stats = new ArrayList<>();
+        stats.add(new Stat("45", "Students"));
+        stats.add(new Stat("5", "Classes"));
+        stats.add(new Stat("12", "Assignments"));
+        for (Stat stat : stats) {
+            addStatCard(stat.count, stat.title);
+        }
 
-        // Add cards into layout_stats
-        addStatCard("45", "Students");
-        addStatCard("5", "Classes");
-        addStatCard("12", "Assignments");
+        // Simulate dynamic actions data
+        ArrayList<Action> actions = new ArrayList<>();
+        actions.add(new Action(R.drawable.ic_notification, "Notifications"));
+        actions.add(new Action(R.drawable.ic_subjects, "Attendance"));
+        actions.add(new Action(R.drawable.ic_home, "Materials"));
+        actions.add(new Action(R.drawable.ic_report, "Alerts"));
+        for (Action action : actions) {
+            addActionCard(action.iconRes, action.label);
+        }
 
-        // Add actions into layout_actions
-        addActionCard("📷", "Attendance");
-        addActionCard("📄", "Assignments");
-        addActionCard("📘", "Materials");
-        addActionCard("🔔", "Notifications");
-
-        // Add today's classes into layout_extra
-        addClassCard("Maths", "Grade 10", "9:00 AM", "Now");
-        addClassCard("Physics", "Grade 11", "11:00 AM", "Upcoming");
+        // Simulate dynamic class data
+        ArrayList<ClassItem> classes = new ArrayList<>();
+        classes.add(new ClassItem("Maths", "Grade 10", "9:00 AM", "Now"));
+        classes.add(new ClassItem("Physics", "Grade 11", "11:00 AM", "Upcoming"));
+        for (ClassItem classItem : classes) {
+            addClassCard(classItem.subject, classItem.grade, classItem.time, classItem.status);
+        }
     }
 
     private void addStatCard(String count, String title) {
@@ -77,10 +86,14 @@ public class HomeFragment extends Fragment {
         layoutStats.addView(card);
     }
 
-    private void addActionCard(String icon, String label) {
+    private void addActionCard(int iconRes, String label) {
         View card = LayoutInflater.from(getContext()).inflate(R.layout.card_action, layoutActions, false);
-        ((TextView) card.findViewById(R.id.action_icon)).setText(icon);
         ((TextView) card.findViewById(R.id.action_label)).setText(label);
+        // Ensure the layout has an ImageView with id action_icon
+        ImageView iconView = card.findViewById(R.id.action_icon);
+        if (iconView != null) {
+            iconView.setImageResource(iconRes);
+        }
         layoutActions.addView(card);
     }
 
@@ -93,10 +106,8 @@ public class HomeFragment extends Fragment {
         layoutExtra.addView(card);
     }
 
-
     private void loadStudentContent() {
         setWelcome("Welcome, Student");
-
         addSimpleText(layoutStats, "Stats: Subjects, Progress");
         addSimpleText(layoutActions, "Actions: View Materials, Submit Work");
         addSimpleText(layoutExtra, "Extra: Upcoming Assignments");
@@ -104,13 +115,10 @@ public class HomeFragment extends Fragment {
 
     private void loadAdminContent() {
         setWelcome("Welcome, Admin");
-
         addSimpleText(layoutStats, "Stats: Total Students, Teachers, Revenue");
         addSimpleText(layoutActions, "Actions: Manage Users, Reports");
         addSimpleText(layoutExtra, "Extra: System Overview");
     }
-
-    // Shared helper methods
 
     private void setWelcome(String title) {
         layoutWelcome.removeAllViews();
@@ -127,5 +135,33 @@ public class HomeFragment extends Fragment {
         textView.setTextSize(16);
         textView.setPadding(0, 12, 0, 12);
         parent.addView(textView);
+    }
+
+    // Data models
+    private static class Stat {
+        String count, title;
+        Stat(String count, String title) {
+            this.count = count;
+            this.title = title;
+        }
+    }
+
+    private static class Action {
+        int iconRes;
+        String label;
+        Action(int iconRes, String label) {
+            this.iconRes = iconRes;
+            this.label = label;
+        }
+    }
+
+    private static class ClassItem {
+        String subject, grade, time, status;
+        ClassItem(String subject, String grade, String time, String status) {
+            this.subject = subject;
+            this.grade = grade;
+            this.time = time;
+            this.status = status;
+        }
     }
 }
