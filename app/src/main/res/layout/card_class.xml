@@ -3,13 +3,13 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:background="#EEF1FF"
+    android:background="#D2DAFF"
     android:padding="12dp"
     android:layout_marginTop="8dp"
     android:layout_marginBottom="8dp"
     android:elevation="2dp">
 
-    <!-- 🔹 First Row: Subject & Status -->
+    <!-- First Row: Subject & Status -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -46,7 +46,7 @@
             android:paddingBottom="4dp" />
     </LinearLayout>
 
-    <!-- 🔹 Second Row: Grade & Time -->
+    <!--  Second Row: Grade & Time -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
