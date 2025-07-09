@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -10,40 +9,66 @@
     android:layout_marginBottom="8dp"
     android:elevation="2dp">
 
-    <TextView
-        android:layout_width="wrap_content"
+    <!-- 🔹 First Row: Subject & Status -->
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/class_subject"
-        android:text="Mathematics"
-        android:textStyle="bold"
-        android:textSize="16sp" />
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="4dp">
 
-    <TextView
-        android:layout_width="wrap_content"
+        <TextView
+            android:id="@+id/class_subject"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Mathematics"
+            android:textStyle="bold"
+            android:textSize="16sp" />
+
+        <!-- Space/to align left -->
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <TextView
+            android:id="@+id/class_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Now"
+            android:textSize="12sp"
+            android:textColor="#00A300"
+            android:textStyle="bold"
+            android:background="@drawable/bg_shape"
+            android:paddingLeft="12dp"
+            android:paddingRight="12dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp" />
+    </LinearLayout>
+
+    <!-- 🔹 Second Row: Grade & Time -->
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="6px"
-        android:id="@+id/class_grade"
-        android:text="Grade 10" />
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/class_time"
-        android:layout_marginLeft="260dp"
-        android:layout_marginTop="-20dp"
-        android:text="9:00 AM - 10:30 AM" />
+        <TextView
+            android:id="@+id/class_grade"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Grade 10" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/class_status"
-        android:layout_marginTop="-39dp"
-        android:layout_marginLeft="350dp"
-        android:textSize="14dp"
-        android:text="Now"
-        android:textColor="#00A300"
-        android:textStyle="bold" />
+        <!-- Space/to align left -->
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
 
-
-
+        <TextView
+            android:id="@+id/class_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="9:00 AM – 10:30 AM" />
+    </LinearLayout>
 </LinearLayout>

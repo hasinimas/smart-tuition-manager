@@ -13,33 +13,38 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:padding="16dp"
+            android:background="#F5F5F5">
 
-            <!-- Shared: Welcome Banner -->
+            <!-- 🔹 Welcome Banner with Notification Bell -->
             <LinearLayout
                 android:id="@+id/layout_welcome"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical" />
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="8dp" />
 
-            <!-- Role-specific: Stats Section -->
+            <!-- 🔹 Stats Section -->
             <LinearLayout
                 android:id="@+id/layout_stats"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginTop="16dp" />
+                android:layout_marginTop="16dp"
+                android:weightSum="3" />
 
-            <!-- Role-specific: Action Grid -->
+            <!-- 🔹 Action Grid -->
             <GridLayout
                 android:id="@+id/layout_actions"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:columnCount="2"
+                android:rowCount="2"
                 android:layout_marginTop="16dp"
                 android:useDefaultMargins="true" />
 
-            <!-- Role-specific: Extra Section -->
+            <!-- 🔹 Extra Section (Today's Classes, etc) -->
             <LinearLayout
                 android:id="@+id/layout_extra"
                 android:layout_width="match_parent"
@@ -50,5 +55,3 @@
         </LinearLayout>
     </ScrollView>
 </FrameLayout>
-
-

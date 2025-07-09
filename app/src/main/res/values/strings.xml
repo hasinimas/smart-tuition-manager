@@ -15,6 +15,7 @@
     <string name="register_message">Please contact your tuition center administrator to register for an account.   0112458595/0774559982</string>
     <string name="back_to_login">Back to Login</string>
     <string name="hello_blank_fragment" />
+    <string name="notifications">Notifications</string>
 
 
 </resources>
