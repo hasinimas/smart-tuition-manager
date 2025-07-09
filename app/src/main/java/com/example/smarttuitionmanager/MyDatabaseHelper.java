@@ -1,6 +1,8 @@
 package com.example.smarttuitionmanager;
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
@@ -13,7 +15,7 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
 
     public MyDatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
-SQLiteDatabase db  = this.getWritableDatabase();
+     SQLiteDatabase db  = this.getWritableDatabase();
 
     }
 
@@ -98,4 +100,33 @@ SQLiteDatabase db  = this.getWritableDatabase();
         onCreate(db);
 
     }
+
+    //------------------------------- Attendance Side -----------------------------------------------------
+
+    // Insert new attendance record
+    public boolean markAttendance(int studentId, int subjectId, String date, String status) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("student_id", studentId);
+        values.put("Subject_id", subjectId);
+        values.put("date", date);
+        values.put("status", status);
+        long result = db.insert("ATTENDANCE", null, values);
+        return result != -1;
+    }
+
+    // Get all attendance records for a subject
+    public Cursor getAttendanceBySubject(int subjectId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery("SELECT * FROM ATTENDANCE WHERE Subject_id = ?", new String[]{String.valueOf(subjectId)});
+    }
+
+    // Get attendance for a student in a subject
+    public Cursor getAttendanceForStudent(int studentId, int subjectId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery("SELECT * FROM ATTENDANCE WHERE student_id = ? AND Subject_id = ?", new String[]{String.valueOf(studentId), String.valueOf(subjectId)});
+    }
+
+ // ----------------------------------------------------------------------------------------------------
+
 }
