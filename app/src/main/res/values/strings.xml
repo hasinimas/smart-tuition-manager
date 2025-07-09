@@ -16,6 +16,7 @@
     <string name="back_to_login">Back to Login</string>
     <string name="hello_blank_fragment" />
     <string name="notifications">Notifications</string>
+    <string name="generate_qr_code_for_session">Generate QR Code for Session</string>
 
 
 </resources>
