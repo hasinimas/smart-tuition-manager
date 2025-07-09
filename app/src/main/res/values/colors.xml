@@ -6,6 +6,8 @@
     <!-- Primary Colors -->
     <color name="primary">#2196F3</color>
     <color name="primary_dark">#1976D2</color>
+    <color name="primary_one">#B1B2FF</color>
+    <color name="primary_two">#AAC4FF</color>
     <color name="primary_light">#BBDEFB</color>
     <color name="primary_lightest">#bbe4fc</color>
 

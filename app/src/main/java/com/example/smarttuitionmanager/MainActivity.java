@@ -7,6 +7,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.fragment.app.Fragment;
+
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity {
  MyDatabaseHelper mydb;
@@ -32,10 +35,34 @@ public class MainActivity extends AppCompatActivity {
             bundle.putString("role", "teacher"); // Change this to "student" or "admin" to test
             homeFragment.setArguments(bundle);
 
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, homeFragment)
-                    .commit();
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, homeFragment).commit();
         }
+
+        BottomNavigationView bottomNav = findViewById(R.id.bottomNavigationBar);
+        bottomNav.setOnItemSelectedListener(item -> {
+            Fragment selectedFragment = null;
+            Bundle bundle = new Bundle();
+            bundle.putString("role", "teacher");
+
+            if (item.getItemId() == R.id.navHome) {
+                selectedFragment = new HomeFragment();
+            } else if (item.getItemId() == R.id.navAttendance) {
+                selectedFragment = new TeacherAttendanceFragment();
+            } else if (item.getItemId() == R.id.navSubjects) {
+                selectedFragment = new SubjectsFragment();
+            } else if (item.getItemId() == R.id.navProfile) {
+                selectedFragment = new ProfileFragment();
+            }
+
+            if (selectedFragment != null) {
+                selectedFragment.setArguments(bundle);
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, selectedFragment)
+                        .commit();
+            }
+
+            return true;
+        });
 
     }
 }

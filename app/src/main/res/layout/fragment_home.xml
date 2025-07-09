@@ -16,25 +16,28 @@
             android:padding="16dp"
             android:background="#F5F5F5">
 
-            <!-- 🔹 Welcome Banner with Notification Bell -->
+            <!-- Welcome Banner -->
             <LinearLayout
                 android:id="@+id/layout_welcome"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="60dp"
+                android:padding="8dp"
                 android:orientation="horizontal"
+                android:background="@color/primary_one"
                 android:gravity="center_vertical"
-                android:layout_marginBottom="8dp" />
+                android:layout_marginBottom="8dp"
+                android:layout_margin="0dp"/>   <!-- Remove or set to 0dp -->
 
-            <!-- 🔹 Stats Section -->
+            <!-- Stats Section -->
             <LinearLayout
                 android:id="@+id/layout_stats"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="14dp"
                 android:weightSum="3" />
 
-            <!-- 🔹 Action Grid -->
+            <!-- Action Grid -->
             <GridLayout
                 android:id="@+id/layout_actions"
                 android:layout_width="match_parent"
@@ -42,9 +45,11 @@
                 android:columnCount="2"
                 android:rowCount="2"
                 android:layout_marginTop="16dp"
-                android:useDefaultMargins="true" />
+                android:useDefaultMargins="true"
+                android:horizontalSpacing="16dp"
+                android:verticalSpacing="16dp" />
 
-            <!-- 🔹 Extra Section (Today's Classes, etc) -->
+            <!--  Extra Section (Today's Classes, etc) -->
             <LinearLayout
                 android:id="@+id/layout_extra"
                 android:layout_width="match_parent"
