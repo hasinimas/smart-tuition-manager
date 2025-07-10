@@ -35,5 +35,8 @@
     <color name="button_secondary">#FFFFFF</color>
     <color name="button_secondary_pressed">#F5F5F5</color>
 
+    <color name="snackbar_success">#4CAF50</color>
+
+
 
 </resources>
