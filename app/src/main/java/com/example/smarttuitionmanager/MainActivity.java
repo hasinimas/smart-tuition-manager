@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
             } else if (item.getItemId() == R.id.navAttendance) {
                 selectedFragment = new TeacherAttendanceFragment();
             } else if (item.getItemId() == R.id.navSubjects) {
-                selectedFragment = new SubjectsFragment();
+                selectedFragment = new GenerateQRFragment();  // just change new SubjectsFragment();
             } else if (item.getItemId() == R.id.navProfile) {
                 selectedFragment = new ProfileFragment();
             }
