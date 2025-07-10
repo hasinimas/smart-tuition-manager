@@ -44,13 +44,20 @@ public class MainActivity extends AppCompatActivity {
             Bundle bundle = new Bundle();
             bundle.putString("role", "teacher");
 
-            if (item.getItemId() == R.id.navHome) {
+            if (item.getItemId() == R.id.navHome)
+            {
                 selectedFragment = new HomeFragment();
-            } else if (item.getItemId() == R.id.navAttendance) {
+            } else if (item.getItemId() == R.id.navAttendance)
+            {
                 selectedFragment = new TeacherAttendanceFragment();
-            } else if (item.getItemId() == R.id.navSubjects) {
-                selectedFragment = new SubjectsFragment();
-            } else if (item.getItemId() == R.id.navProfile) {
+
+            }
+            else if (item.getItemId() == R.id.navSubjects)
+            {
+                selectedFragment = new TeacherCourseGuide();
+            }
+            else if (item.getItemId() == R.id.navProfile)
+            {
                 selectedFragment = new ProfileFragment();
             }
 
