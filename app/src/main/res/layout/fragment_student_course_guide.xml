@@ -68,9 +68,7 @@
             <TextView
 
                 android:text="Student Course Material"
-
- 
-                 android:textSize="25sp"
+                android:textSize="25sp"
                 android:textStyle="bold"
                 android:textColor="#00224B"
                 android:layout_marginBottom="24dp"
@@ -92,11 +90,10 @@
                 android:layout_marginBottom="16dp" />
 
             <!-- Material Title -->
-<<<<<<< HEAD
-=======
 
 
->>>>>>> 75db3f4deb8eafdaa7479d2d8d20ac784a04ccc7
+
+
             <!-- Container for course materials -->
             <LinearLayout
                 android:id="@+id/material_list"
@@ -108,11 +105,7 @@
             </LinearLayout>
 
 
-<<<<<<< HEAD
 
-
-=======
->>>>>>> 75db3f4deb8eafdaa7479d2d8d20ac784a04ccc7
             <!-- Select PDF Button -->
             <Button
                 android:id="@+id/btn_select_pdf"
