@@ -51,10 +51,14 @@ public class MainActivity extends AppCompatActivity {
             {
                 selectedFragment = new TeacherAttendanceFragment();
             }
+
+
             else if (item.getItemId() == R.id.navSubjects)
             {
                 selectedFragment = new TeacherCourseGuide();
             }
+
+
             else if (item.getItemId() == R.id.navProfile)
             {
                 selectedFragment = new ProfileFragment();

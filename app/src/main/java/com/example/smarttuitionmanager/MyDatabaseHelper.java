@@ -3,11 +3,14 @@ package com.example.smarttuitionmanager;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+
 import android.content.ContentValues;
 import android.database.Cursor;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+
 
 public class MyDatabaseHelper extends SQLiteOpenHelper {
 
@@ -21,6 +24,7 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         // Leave empty if you don't want to create anything for now
+
         // Student table
         db.execSQL("CREATE TABLE student (" +
                 "s_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -45,10 +49,12 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
                 "subject_id INTEGER NOT NULL, " +
                 "FOREIGN KEY(student_id) REFERENCES student(s_id), " +
                 "FOREIGN KEY(subject_id) REFERENCES subject(subject_id))");
+
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+
 
         // Don't recreate anything now
     }
@@ -149,3 +155,4 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
         return students;
     }
 }
+
