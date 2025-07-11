@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:paddingTop="4dp"
+    android:paddingBottom="4dp"
+    android:background="@color/background_white">
+    <TextView android:id="@+id/tv_s_id" android:layout_width="wrap_content" android:layout_height="wrap_content" android:paddingStart="8dp" android:paddingEnd="8dp" android:textSize="13sp" android:singleLine="true" android:ellipsize="end" />
+    <TextView android:id="@+id/tv_first_name" android:layout_width="wrap_content" android:layout_height="wrap_content" android:paddingStart="8dp" android:paddingEnd="8dp" android:textSize="13sp" android:singleLine="true" android:ellipsize="end" />
+    <TextView android:id="@+id/tv_last_name" android:layout_width="wrap_content" android:layout_height="wrap_content" android:paddingStart="8dp" android:paddingEnd="8dp" android:textSize="13sp" android:singleLine="true" android:ellipsize="end" />
+    <TextView android:id="@+id/tv_class" android:layout_width="wrap_content" android:layout_height="wrap_content" android:paddingStart="8dp" android:paddingEnd="8dp" android:textSize="13sp" android:singleLine="true" android:ellipsize="end" />
+    <TextView android:id="@+id/tv_subjects" android:layout_width="wrap_content" android:layout_height="wrap_content" android:paddingStart="8dp" android:paddingEnd="8dp" android:textSize="13sp" android:singleLine="true" android:ellipsize="end" />
+    <TextView android:id="@+id/tv_phone" android:layout_width="wrap_content" android:layout_height="wrap_content" android:paddingStart="8dp" android:paddingEnd="8dp" android:textSize="13sp" android:singleLine="true" android:ellipsize="end" />
+    <TextView android:id="@+id/tv_guardian_tp" android:layout_width="wrap_content" android:layout_height="wrap_content" android:paddingStart="8dp" android:paddingEnd="8dp" android:textSize="13sp" android:singleLine="true" android:ellipsize="end" />
+    <TextView android:id="@+id/tv_email" android:layout_width="wrap_content" android:layout_height="wrap_content" android:paddingStart="8dp" android:paddingEnd="8dp" android:textSize="13sp" android:singleLine="true" android:ellipsize="end" />
+    <TextView android:id="@+id/tv_password" android:layout_width="wrap_content" android:layout_height="wrap_content" android:paddingStart="8dp" android:paddingEnd="8dp" android:textSize="13sp" android:singleLine="true" android:ellipsize="end" />
+</LinearLayout> 

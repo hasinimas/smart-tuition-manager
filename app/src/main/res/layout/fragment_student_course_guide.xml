@@ -64,8 +64,7 @@
                     android:ellipsize="end" />
             </LinearLayout>
 
-            <!-- Title -->
-            <TextView
+             <TextView
 
                 android:text="Student Course Material"
 
@@ -77,8 +76,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
-            <!-- Select Course -->
-            <TextView
+             <TextView
                 android:text="Select Course"
                 android:textColor="#000000"
                 android:layout_width="wrap_content"
@@ -91,14 +89,7 @@
                 android:backgroundTint="#000000"
                 android:layout_marginBottom="16dp" />
 
-            <!-- Material Title -->
-            /(
-            <!-- <<<<<<< HEAD
-           =======
 
-
-           >>>>>>> 75db3f4deb8eafdaa7479d2d8d20ac784a04ccc7
-                       <!- Container for course materials -->
             <LinearLayout
                 android:id="@+id/material_list"
                 android:layout_width="match_parent"
@@ -107,14 +98,9 @@
                 android:paddingTop="16dp"
                 android:paddingBottom="16dp">
             </LinearLayout>
+          
+            <!-- Select PDF Button -->
 
-
-            <!-- <<<<<<< HEAD>
-
-
-           =======
-           >>>>>>> 75db3f4deb8eafdaa7479d2d8d20ac784a04ccc7
-                       <!- Select PDF Button -->
             <Button
                 android:id="@+id/btn_select_pdf"
                 android:text="Select PDF"

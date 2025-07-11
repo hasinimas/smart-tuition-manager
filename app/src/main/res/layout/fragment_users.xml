@@ -64,7 +64,8 @@
             android:textColor="@color/text_secondary"
             android:gravity="center"
             android:padding="12dp"
-            android:background="@color/background_white" />
+            android:background="@color/background_white"
+            android:textStyle="bold" />
         <TextView
             android:id="@+id/tab_teachers"
             android:layout_width="0dp"
@@ -74,7 +75,8 @@
             android:textColor="@color/text_secondary"
             android:gravity="center"
             android:padding="12dp"
-            android:background="@color/background_white" />
+            android:background="@color/background_white"
+            android:textStyle="bold" />
     </LinearLayout>
 
     <!-- Search and Add Button Row -->
@@ -110,48 +112,60 @@
             android:textStyle="bold" />
     </LinearLayout>
 
-    <!-- Table Header -->
-    <LinearLayout
+    <!-- Table Header for Students -->
+    <HorizontalScrollView
+        android:id="@+id/header_students"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        android:paddingTop="4dp"
-        android:paddingBottom="4dp"
-        android:background="@color/background_white">
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="2"
-            android:text="NAME"
-            android:textColor="@color/text_secondary"
-            android:textStyle="bold"
-            android:textSize="13sp" />
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="EMAIL"
-            android:textColor="@color/text_secondary"
-            android:textStyle="bold"
-            android:textSize="13sp" />
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="GRADE"
-            android:textColor="@color/text_secondary"
-            android:textStyle="bold"
-            android:textSize="13sp" />
-        <TextView
+        android:scrollbars="horizontal"
+        android:visibility="visible">
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="STATUS"
-            android:textColor="@color/text_secondary"
-            android:textStyle="bold"
-            android:textSize="13sp" />
-    </LinearLayout>
+            android:orientation="horizontal"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+            android:background="@color/background_white">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="S_ID" android:textColor="@color/text_secondary" android:textStyle="bold" android:textSize="13sp" android:paddingStart="8dp" android:paddingEnd="8dp" android:singleLine="true" android:ellipsize="end" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="First Name" android:textColor="@color/text_secondary" android:textStyle="bold" android:textSize="13sp" android:paddingStart="8dp" android:paddingEnd="8dp" android:singleLine="true" android:ellipsize="end" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Last Name" android:textColor="@color/text_secondary" android:textStyle="bold" android:textSize="13sp" android:paddingStart="8dp" android:paddingEnd="8dp" android:singleLine="true" android:ellipsize="end" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Class" android:textColor="@color/text_secondary" android:textStyle="bold" android:textSize="13sp" android:paddingStart="8dp" android:paddingEnd="8dp" android:singleLine="true" android:ellipsize="end" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Subjects" android:textColor="@color/text_secondary" android:textStyle="bold" android:textSize="13sp" android:paddingStart="8dp" android:paddingEnd="8dp" android:singleLine="true" android:ellipsize="end" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Phone Number" android:textColor="@color/text_secondary" android:textStyle="bold" android:textSize="13sp" android:paddingStart="8dp" android:paddingEnd="8dp" android:singleLine="true" android:ellipsize="end" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Guardian TP" android:textColor="@color/text_secondary" android:textStyle="bold" android:textSize="13sp" android:paddingStart="8dp" android:paddingEnd="8dp" android:singleLine="true" android:ellipsize="end" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="EMAIL" android:textColor="@color/text_secondary" android:textStyle="bold" android:textSize="13sp" android:paddingStart="8dp" android:paddingEnd="8dp" android:singleLine="true" android:ellipsize="end" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Password" android:textColor="@color/text_secondary" android:textStyle="bold" android:textSize="13sp" android:paddingStart="8dp" android:paddingEnd="8dp" android:singleLine="true" android:ellipsize="end" />
+        </LinearLayout>
+    </HorizontalScrollView>
+    <!-- Table Header for Teachers -->
+    <HorizontalScrollView
+        android:id="@+id/header_teachers"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scrollbars="horizontal"
+        android:visibility="gone">
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+            android:background="@color/background_white">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="T_ID" android:textColor="@color/text_secondary" android:textStyle="bold" android:textSize="13sp" android:paddingStart="8dp" android:paddingEnd="8dp" android:singleLine="true" android:ellipsize="end" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="First Name" android:textColor="@color/text_secondary" android:textStyle="bold" android:textSize="13sp" android:paddingStart="8dp" android:paddingEnd="8dp" android:singleLine="true" android:ellipsize="end" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Last Name" android:textColor="@color/text_secondary" android:textStyle="bold" android:textSize="13sp" android:paddingStart="8dp" android:paddingEnd="8dp" android:singleLine="true" android:ellipsize="end" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Class" android:textColor="@color/text_secondary" android:textStyle="bold" android:textSize="13sp" android:paddingStart="8dp" android:paddingEnd="8dp" android:singleLine="true" android:ellipsize="end" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Subject" android:textColor="@color/text_secondary" android:textStyle="bold" android:textSize="13sp" android:paddingStart="8dp" android:paddingEnd="8dp" android:singleLine="true" android:ellipsize="end" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Phone Number" android:textColor="@color/text_secondary" android:textStyle="bold" android:textSize="13sp" android:paddingStart="8dp" android:paddingEnd="8dp" android:singleLine="true" android:ellipsize="end" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="ID Number" android:textColor="@color/text_secondary" android:textStyle="bold" android:textSize="13sp" android:paddingStart="8dp" android:paddingEnd="8dp" android:singleLine="true" android:ellipsize="end" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="EMAIL" android:textColor="@color/text_secondary" android:textStyle="bold" android:textSize="13sp" android:paddingStart="8dp" android:paddingEnd="8dp" android:singleLine="true" android:ellipsize="end" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Password" android:textColor="@color/text_secondary" android:textStyle="bold" android:textSize="13sp" android:paddingStart="8dp" android:paddingEnd="8dp" android:singleLine="true" android:ellipsize="end" />
+        </LinearLayout>
+    </HorizontalScrollView>
 
     <!-- User List -->
     <androidx.recyclerview.widget.RecyclerView
@@ -163,5 +177,14 @@
         android:paddingEnd="8dp"
         android:clipToPadding="false"
         android:background="@color/background_light" />
+
+    <!-- Student List RecyclerView -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_students"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:padding="8dp"
+        android:clipToPadding="false" />
 
 </LinearLayout>
