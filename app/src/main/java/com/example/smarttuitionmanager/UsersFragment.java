@@ -115,7 +115,9 @@ public class UsersFragment extends Fragment {
                             EditText etFirstName = dialogView.findViewById(R.id.et_first_name);
                             EditText etLastName = dialogView.findViewById(R.id.et_last_name);
                             EditText etSubject = dialogView.findViewById(R.id.et_subject);
-                            EditText etAddress = dialogView.findViewById(R.id.et_address);
+                            EditText etStreetNo = dialogView.findViewById(R.id.et_street_no);
+                            EditText etStreetName = dialogView.findViewById(R.id.et_street_name);
+                            EditText etCity = dialogView.findViewById(R.id.et_city);
                             EditText etPhone = dialogView.findViewById(R.id.et_phone);
                             EditText etClass = dialogView.findViewById(R.id.et_class);
                             EditText etIdNumber = dialogView.findViewById(R.id.et_id_number);
@@ -132,8 +134,14 @@ public class UsersFragment extends Fragment {
                             if (etSubject != null && etSubject.getText().toString().trim().isEmpty()) {
                                 etSubject.setError("Required"); valid = false;
                             }
-                            if (etAddress.getText().toString().trim().isEmpty()) {
-                                etAddress.setError("Required"); valid = false;
+                            if (etStreetNo.getText().toString().trim().isEmpty()) {
+                                etStreetNo.setError("Required"); valid = false;
+                            }
+                            if (etStreetName.getText().toString().trim().isEmpty()) {
+                                etStreetName.setError("Required"); valid = false;
+                            }
+                            if (etCity.getText().toString().trim().isEmpty()) {
+                                etCity.setError("Required"); valid = false;
                             }
                             if (etPhone.getText().toString().trim().isEmpty()) {
                                 etPhone.setError("Required"); valid = false;
@@ -204,11 +212,12 @@ public class UsersFragment extends Fragment {
                             EditText etFirstName = dialogView.findViewById(R.id.et_first_name);
                             EditText etLastName = dialogView.findViewById(R.id.et_last_name);
                             EditText etSubject = dialogView.findViewById(R.id.et_subject);
-                            EditText etAddress = dialogView.findViewById(R.id.et_address);
+                            EditText etStreetNo = dialogView.findViewById(R.id.et_street_no);
+                            EditText etStreetName = dialogView.findViewById(R.id.et_street_name);
+                            EditText etCity = dialogView.findViewById(R.id.et_city);
                             EditText etPhone = dialogView.findViewById(R.id.et_phone);
                             EditText etClass = dialogView.findViewById(R.id.et_class);
                             EditText etGuardianTP = dialogView.findViewById(R.id.et_guardian_tp);
-                            EditText etIdNumber = dialogView.findViewById(R.id.et_id_number);
                             EditText etEmail = dialogView.findViewById(R.id.et_email);
                             EditText etPassword = dialogView.findViewById(R.id.et_password);
 
@@ -222,8 +231,14 @@ public class UsersFragment extends Fragment {
                             if (etSubject != null && etSubject.getText().toString().trim().isEmpty()) {
                                 etSubject.setError("Required"); valid = false;
                             }
-                            if (etAddress.getText().toString().trim().isEmpty()) {
-                                etAddress.setError("Required"); valid = false;
+                            if (etStreetNo.getText().toString().trim().isEmpty()) {
+                                etStreetNo.setError("Required"); valid = false;
+                            }
+                            if (etStreetName.getText().toString().trim().isEmpty()) {
+                                etStreetName.setError("Required"); valid = false;
+                            }
+                            if (etCity.getText().toString().trim().isEmpty()) {
+                                etCity.setError("Required"); valid = false;
                             }
                             if (etPhone.getText().toString().trim().isEmpty()) {
                                 etPhone.setError("Required"); valid = false;
@@ -237,9 +252,6 @@ public class UsersFragment extends Fragment {
                                 etGuardianTP.setError("Required"); valid = false;
                             } else if (!etGuardianTP.getText().toString().matches("\\d+")) {
                                 etGuardianTP.setError("Only numbers allowed"); valid = false;
-                            }
-                            if (etIdNumber.getText().toString().trim().isEmpty()) {
-                                etIdNumber.setError("Required"); valid = false;
                             }
                             if (etEmail.getText().toString().trim().isEmpty()) {
                                 etEmail.setError("Required"); valid = false;
