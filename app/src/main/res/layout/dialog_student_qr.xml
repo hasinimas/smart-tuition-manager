@@ -18,27 +18,20 @@
     <!-- Empty QR field (ImageView placeholder) -->
     <ImageView
         android:id="@+id/iv_student_qr"
-        android:layout_width="200dp"
-        android:layout_height="200dp"
+        android:layout_width="256dp"
+        android:layout_height="256dp"
         android:layout_gravity="center_horizontal"
         android:background="@android:color/darker_gray"
         android:contentDescription="Student QR Code"
-        android:layout_marginBottom="24dp" />
+        android:layout_marginBottom="24dp"
+        android:src="@drawable/ic_student_qr" />
 
-    <Button
-        android:id="@+id/btn_generate_qr"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Generate QR"
-        android:layout_marginBottom="12dp"
-        android:backgroundTint="@color/primary"
-        android:textColor="@color/white" />
 
     <Button
         android:id="@+id/btn_submit_qr"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Submit QR"
+        android:text="Add QR Code"
         android:backgroundTint="@color/primary"
         android:textColor="@color/white" />
 
