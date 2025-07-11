@@ -100,6 +100,33 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
         return db.insert("student_subject", null, values);
     }
 
+    // Delete a student and their subject mappings
+    public void deleteStudent(long studentId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete("student_subject", "student_id=?", new String[]{String.valueOf(studentId)});
+        db.delete("student", "s_id=?", new String[]{String.valueOf(studentId)});
+    }
+
+    // Update a student by s_id
+    public void updateStudent(long studentId, String firstName, String lastName, String grade, String phoneNumber, String guardianTP, String email, String password) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("first_name", firstName);
+        values.put("last_name", lastName);
+        values.put("grade", grade);
+        values.put("phone_number", phoneNumber);
+        values.put("guardian_tp", guardianTP);
+        values.put("email", email);
+        values.put("password", password);
+        db.update("student", values, "s_id=?", new String[]{String.valueOf(studentId)});
+    }
+
+    // Remove all subject mappings for a student
+    public void removeAllSubjectsForStudent(long studentId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete("student_subject", "student_id=?", new String[]{String.valueOf(studentId)});
+    }
+
     // Model class for student with subjects
     public static class StudentWithSubjects {
         public long sId;
