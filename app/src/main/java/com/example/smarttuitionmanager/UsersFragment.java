@@ -16,6 +16,18 @@ import android.animation.AnimatorListenerAdapter;
 import android.view.ViewPropertyAnimator;
 import android.text.InputFilter;
 import android.text.InputType;
+import android.widget.MultiAutoCompleteTextView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
+import android.widget.Button;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
+import android.widget.TextView;
+import android.text.TextUtils;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -71,21 +83,40 @@ public class UsersFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_users, container, false);
 
         // Find views
-        final View tabStudents = view.findViewById(R.id.tab_students);
-        final View tabTeachers = view.findViewById(R.id.tab_teachers);
+        final TextView tabStudents = view.findViewById(R.id.tab_students);
+        final TextView tabTeachers = view.findViewById(R.id.tab_teachers);
         final android.widget.Button btnAddStudent = view.findViewById(R.id.btn_add_student);
+        final View headerStudents = view.findViewById(R.id.header_students);
+        final View headerTeachers = view.findViewById(R.id.header_teachers);
+        final RecyclerView recyclerStudents = view.findViewById(R.id.recycler_students);
+        recyclerStudents.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
+        // Show students by default
+        showStudentList(recyclerStudents);
 
         // Set click listeners
         tabTeachers.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 btnAddStudent.setText("+ Add Teacher");
+                headerStudents.setVisibility(View.GONE);
+                headerTeachers.setVisibility(View.VISIBLE);
+                tabTeachers.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.tab_selected_bg));
+                tabTeachers.setTextColor(ContextCompat.getColor(getContext(), R.color.primary));
+                tabStudents.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.background_white));
+                tabStudents.setTextColor(ContextCompat.getColor(getContext(), R.color.text_secondary));
             }
         });
         tabStudents.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 btnAddStudent.setText("+ Add Student");
+                headerStudents.setVisibility(View.VISIBLE);
+                headerTeachers.setVisibility(View.GONE);
+                tabStudents.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.tab_selected_bg));
+                tabStudents.setTextColor(ContextCompat.getColor(getContext(), R.color.primary));
+                tabTeachers.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.background_white));
+                tabTeachers.setTextColor(ContextCompat.getColor(getContext(), R.color.text_secondary));
+                showStudentList(recyclerStudents);
             }
         });
 
@@ -194,6 +225,30 @@ public class UsersFragment extends Fragment {
                     LayoutInflater dialogInflater = LayoutInflater.from(getContext());
                     View dialogView = dialogInflater.inflate(R.layout.dialog_add_student, null);
 
+                    // Set up multi-select subjects
+                    Spinner spinnerSubject = dialogView.findViewById(R.id.spinner_subject);
+                    Button btnAddSubject = dialogView.findViewById(R.id.btn_add_subject);
+                    TextView tvSelectedSubjects = dialogView.findViewById(R.id.tv_selected_subjects);
+                    String[] subjects = {"Mathematics", "Science", "English", "Sinhala", "History", "Buddhism"};
+                    ArrayAdapter<String> subjectAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, subjects);
+                    subjectAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                    spinnerSubject.setAdapter(subjectAdapter);
+                    ArrayList<String> selectedSubjects = new ArrayList<>();
+                    Set<String> selectedSubjectsSet = new HashSet<>();
+                    btnAddSubject.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            String selected = spinnerSubject.getSelectedItem().toString();
+                            if (!selectedSubjectsSet.contains(selected)) {
+                                selectedSubjects.add(selected);
+                                selectedSubjectsSet.add(selected);
+                                tvSelectedSubjects.setText("Selected Subjects: " + TextUtils.join(", ", selectedSubjects));
+                            } else {
+                                Toast.makeText(getContext(), selected + " already added", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
+
                     // Restrict phone and guardian tp fields to numbers only
                     EditText etPhone = dialogView.findViewById(R.id.et_phone);
                     EditText etGuardianTP = dialogView.findViewById(R.id.et_guardian_tp);
@@ -211,10 +266,6 @@ public class UsersFragment extends Fragment {
                             // Collect data
                             EditText etFirstName = dialogView.findViewById(R.id.et_first_name);
                             EditText etLastName = dialogView.findViewById(R.id.et_last_name);
-                            EditText etSubject = dialogView.findViewById(R.id.et_subject);
-                            EditText etStreetNo = dialogView.findViewById(R.id.et_street_no);
-                            EditText etStreetName = dialogView.findViewById(R.id.et_street_name);
-                            EditText etCity = dialogView.findViewById(R.id.et_city);
                             EditText etPhone = dialogView.findViewById(R.id.et_phone);
                             EditText etClass = dialogView.findViewById(R.id.et_class);
                             EditText etGuardianTP = dialogView.findViewById(R.id.et_guardian_tp);
@@ -227,18 +278,6 @@ public class UsersFragment extends Fragment {
                             }
                             if (etLastName.getText().toString().trim().isEmpty()) {
                                 etLastName.setError("Required"); valid = false;
-                            }
-                            if (etSubject != null && etSubject.getText().toString().trim().isEmpty()) {
-                                etSubject.setError("Required"); valid = false;
-                            }
-                            if (etStreetNo.getText().toString().trim().isEmpty()) {
-                                etStreetNo.setError("Required"); valid = false;
-                            }
-                            if (etStreetName.getText().toString().trim().isEmpty()) {
-                                etStreetName.setError("Required"); valid = false;
-                            }
-                            if (etCity.getText().toString().trim().isEmpty()) {
-                                etCity.setError("Required"); valid = false;
                             }
                             if (etPhone.getText().toString().trim().isEmpty()) {
                                 etPhone.setError("Required"); valid = false;
@@ -262,7 +301,36 @@ public class UsersFragment extends Fragment {
                                 etPassword.setError("Required"); valid = false;
                             }
 
+                            // Validate at least one subject selected
+                            if (selectedSubjects.isEmpty()) {
+                                tvSelectedSubjects.setError("Select at least one subject"); valid = false;
+                            } else {
+                                tvSelectedSubjects.setError(null);
+                            }
+
                             if (!valid) return;
+
+                            // Insert student and subjects into DB
+                            MyDatabaseHelper dbHelper = new MyDatabaseHelper(getContext());
+                            long studentId = dbHelper.insertStudent(
+                                etFirstName.getText().toString().trim(),
+                                etLastName.getText().toString().trim(),
+                                etClass.getText().toString().trim(),
+                                etPhone.getText().toString().trim(),
+                                etGuardianTP.getText().toString().trim(),
+                                null, // qr_img, set to null or handle as needed
+                                etEmail.getText().toString().trim(),
+                                etPassword.getText().toString().trim()
+                            );
+                            for (String subject : selectedSubjects) {
+                                long subjectId = dbHelper.insertSubject(subject);
+                                dbHelper.insertStudentSubject(studentId, subjectId);
+                            }
+                            // Refresh student list after adding
+                            showStudentList(recyclerStudents);
+
+                            // When collecting data, get selected subjects as a comma-separated string
+                            String selectedSubjectsString = TextUtils.join(",", selectedSubjects);
 
                             // Animate success (scale and fade)
                             v.setEnabled(false);
@@ -301,5 +369,12 @@ public class UsersFragment extends Fragment {
         });
 
         return view;
+    }
+
+    private void showStudentList(RecyclerView recyclerStudents) {
+        MyDatabaseHelper dbHelper = new MyDatabaseHelper(getContext());
+        java.util.List<MyDatabaseHelper.StudentWithSubjects> students = dbHelper.getAllStudentsWithSubjects();
+        StudentAdapter adapter = new StudentAdapter(students);
+        recyclerStudents.setAdapter(adapter);
     }
 }
