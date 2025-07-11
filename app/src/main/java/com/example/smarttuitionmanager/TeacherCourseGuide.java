@@ -124,24 +124,25 @@ public class TeacherCourseGuide extends Fragment {
     }
 
     private void uploadMaterial() {
-        if (selectedSubjectId == -1 || selectedPdfUri == null || editTextTitle.getText().toString().trim().isEmpty()) {
-            Toast.makeText(getContext(), "All fields are required", Toast.LENGTH_SHORT).show();
-            return;
-        }
+        // Removed spinner and PDF validations for testing
 
         String title = editTextTitle.getText().toString().trim();
 
-        String filePath = savePdfToInternalStorage(selectedPdfUri, title);
-        if (filePath == null) {
-            Toast.makeText(getContext(), "File saving failed", Toast.LENGTH_SHORT).show();
-            return;
+        // If PDF not selected, skip saving file and leave filePath null
+        String filePath = null;
+        if (selectedPdfUri != null) {
+            filePath = savePdfToInternalStorage(selectedPdfUri, title);
+            if (filePath == null) {
+                Toast.makeText(getContext(), "File saving failed", Toast.LENGTH_SHORT).show();
+                return;
+            }
         }
 
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put("Subject_id", selectedSubjectId);
+        values.put("Subject_id", selectedSubjectId);  // May be -1 if none selected
         values.put("title", title);
-        values.put("file_path", filePath);
+        values.put("file_path", filePath);  // May be null if no PDF selected
         long result = db.insert("Subject_MATERIALS", null, values);
 
         if (result != -1) {
@@ -177,3 +178,5 @@ public class TeacherCourseGuide extends Fragment {
         }
     }
 }
+
+
