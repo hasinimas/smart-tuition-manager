@@ -57,71 +57,33 @@
             </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
 
-        <!-- Subject -->
-        <com.google.android.material.textfield.TextInputLayout
+        <!-- Subject (Dropdown + Add Button + Selected List) -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            app:startIconDrawable="@drawable/ic_subject"
+            android:orientation="horizontal"
             android:layout_marginBottom="10dp">
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/et_subject"
-                android:layout_width="match_parent"
+            <Spinner
+                android:id="@+id/spinner_subject"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:hint="Subject" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <!-- Address Section -->
+                android:layout_weight="2"
+                android:spinnerMode="dropdown" />
+            <Button
+                android:id="@+id/btn_add_subject"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Add Subject"
+                android:backgroundTint="#B1B2FF" />
+        </LinearLayout>
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Address"
-            android:textStyle="bold"
-            android:textSize="16sp"
-            android:textColor="@color/text_primary"
-            android:layout_marginBottom="8dp" />
-
-        <!-- Street No -->
-        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tv_selected_subjects"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            app:startIconDrawable="@drawable/ic_idnumber"
-            android:layout_marginBottom="10dp">
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/et_street_no"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Street No" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <!-- Street Name -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            app:startIconDrawable="@drawable/ic_idnumber"
-            android:layout_marginBottom="10dp">
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/et_street_name"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Street Name" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <!-- City -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            app:startIconDrawable="@drawable/ic_idnumber"
-            android:layout_marginBottom="10dp">
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/et_city"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="City" />
-        </com.google.android.material.textfield.TextInputLayout>
+            android:text="Selected Subjects: "
+            android:textStyle="bold|italic"
+            android:layout_marginBottom="10dp"/>
 
         <!-- Phone Number & Class Row -->
         <LinearLayout
