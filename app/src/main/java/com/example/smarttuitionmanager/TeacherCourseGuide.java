@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.*;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -58,12 +59,31 @@ public class TeacherCourseGuide extends Fragment {
         textSelectedFile = view.findViewById(R.id.text_selected_file);
         Button btnSelectPdf = view.findViewById(R.id.btn_select_pdf);
         Button btnUpload = view.findViewById(R.id.btn_upload);
+        Button assignmentsBtn = view.findViewById(R.id.assignments); // Assignment button
+        Button resultsBtn = view.findViewById(R.id.results);
+
 
         loadSubjectsIntoSpinner();
 
         btnSelectPdf.setOnClickListener(v -> selectPdfFromDevice());
         btnUpload.setOnClickListener(v -> uploadMaterial());
 
+        // ✅ Navigate to TeacherAssignment fragment on button click
+        assignmentsBtn.setOnClickListener(v -> {
+            Fragment teacherAssignmentFragment = new TeacherAssignment();
+            FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
+            transaction.replace(R.id.fragment_container, teacherAssignmentFragment); // Make sure this ID matches your activity layout
+            transaction.addToBackStack(null);
+            transaction.commit();
+        });
+        // ✅ Navigate to TeacherResults fragment on button click
+        resultsBtn.setOnClickListener(v -> {
+            Fragment teacherResultsFragment = new TeacherResults();
+            FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
+            transaction.replace(R.id.fragment_container, teacherResultsFragment); // Make sure this ID matches your activity layout
+            transaction.addToBackStack(null);
+            transaction.commit();
+        });
         return view;
     }
 
@@ -124,8 +144,6 @@ public class TeacherCourseGuide extends Fragment {
     }
 
     private void uploadMaterial() {
-        // Removed spinner and PDF validations for testing
-
         String title = editTextTitle.getText().toString().trim();
 
         // If PDF not selected, skip saving file and leave filePath null
@@ -140,9 +158,9 @@ public class TeacherCourseGuide extends Fragment {
 
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put("Subject_id", selectedSubjectId);  // May be -1 if none selected
+        values.put("Subject_id", selectedSubjectId);
         values.put("title", title);
-        values.put("file_path", filePath);  // May be null if no PDF selected
+        values.put("file_path", filePath);
         long result = db.insert("Subject_MATERIALS", null, values);
 
         if (result != -1) {
@@ -178,5 +196,3 @@ public class TeacherCourseGuide extends Fragment {
         }
     }
 }
-
-
