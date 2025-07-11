@@ -50,7 +50,6 @@ public class MainActivity extends AppCompatActivity {
             } else if (item.getItemId() == R.id.navAttendance)
             {
                 selectedFragment = new TeacherAttendanceFragment();
-
             }
             else if (item.getItemId() == R.id.navSubjects)
             {

@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".TeacherAttendanceFragment">
+    tools:context=".GenerateQRFragment">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -16,39 +16,35 @@
             android:orientation="vertical"
             android:padding="16dp">
 
+            <!-- Title -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
                 android:layout_gravity="center"
                 android:layout_marginBottom="16dp"
                 android:background="@color/primary_one"
-                android:text="Teacher Attendance"
+                android:text="Generate QR Code"
                 android:textColor="#212121"
                 android:textSize="22sp"
                 android:textStyle="bold" />
 
+            <!-- Input for student ID -->
             <EditText
                 android:id="@+id/et_student_id"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                android:hint="Scan/Enter Student ID"
+                android:hint="Enter Student ID"
                 android:inputType="text" />
 
-            <Button
-                android:id="@+id/btn_scan_qr"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:text="Scan QR Code" />
-
+            <!-- Button to generate QR -->
             <Button
                 android:id="@+id/btn_generate_qr"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:text="Generate QR Code for Session" />
+                android:text="Generate QR Code" />
 
+            <!-- QR Code Display -->
             <ImageView
                 android:id="@+id/qr_image_view"
                 android:layout_width="300dp"
@@ -58,19 +54,8 @@
                 android:visibility="gone"
                 android:contentDescription="QR Code" />
 
-            <Button
-                android:id="@+id/btn_mark_attendance"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:enabled="false"
-                android:text="Mark Attendance" />
-
-            <ListView
-                android:id="@+id/lv_attendance_list"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp" />
         </LinearLayout>
+
     </ScrollView>
+
 </FrameLayout>
