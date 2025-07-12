@@ -36,4 +36,13 @@
     <color name="button_secondary_pressed">#F5F5F5</color>
 
 
+    <color name="user_management_bg">#AAC4FF</color>
+    <color name="user_searchbar_bg">#F5F5F5</color>
+    <color name="tab_selected_bg">#D2DAFF</color>
+
+    <color name="snackbar_success">#4CAF50</color>
+
+
+
+
 </resources>
