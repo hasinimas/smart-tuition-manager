@@ -73,7 +73,7 @@ public class TeacherCourseGuide extends Fragment {
         List<Integer> subjectIds = new ArrayList<>();
 
         // Replace 1 with actual teacher_id from login/session
-        Cursor cursor = db.rawQuery("SELECT Subject_id, Subject_name FROM Subject WHERE teacher_id = ?", new String[]{"1"});
+        Cursor cursor = db.rawQuery("SELECT subject_id, name FROM Subject WHERE teacher_id = ?", new String[]{"1"});
         while (cursor.moveToNext()) {
             subjectIds.add(cursor.getInt(0));
             subjectNames.add(cursor.getString(1));

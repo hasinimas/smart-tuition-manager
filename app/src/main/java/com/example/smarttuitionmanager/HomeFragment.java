@@ -31,7 +31,7 @@ public class HomeFragment extends Fragment {
 
         // Get user role from arguments (default to "student")
         if (getArguments() != null) {
-            userRole = getArguments().getString("role", "student");
+            userRole = getArguments().getString("role", "teacher");
         } else {
             userRole = "student";
         }

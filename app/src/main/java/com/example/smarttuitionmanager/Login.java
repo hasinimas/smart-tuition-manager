@@ -111,12 +111,12 @@ public class Login extends AppCompatActivity {
 
     private void handleGoogleSignIn() {
         Toast.makeText(this, "Google Log In clicked", Toast.LENGTH_SHORT).show();
-        // TODO: Implement Google Log In if needed
+
     }
 
     private void handleForgotPassword() {
         Toast.makeText(this, "Forgot Password clicked", Toast.LENGTH_SHORT).show();
-        // TODO: Navigate to forgot password screen
+        // wanna do Navigate to forgot password screen
     }
 
     private void handleSignUp() {

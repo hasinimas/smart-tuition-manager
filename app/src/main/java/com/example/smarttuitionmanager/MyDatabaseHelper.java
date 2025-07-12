@@ -15,7 +15,7 @@ import java.util.List;
 public class MyDatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "TuitionDB";
-    private static final int DATABASE_VERSION = 2;  // <-- increment this
+    private static final int DATABASE_VERSION = 2;
 
     public MyDatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -154,5 +154,27 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
         cs.close();
         return students;
     }
+
+    // -------------------------------------------- Attendance ---------------------------------------------------------------
+    public void updateStudentQR(long studentId, String base64QR) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("qr_img", base64QR);
+        db.update("student", values, "s_id = ?", new String[]{String.valueOf(studentId)});
+    }
+
+    public String getStudentQR(long studentId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT qr_img FROM student WHERE s_id = ?", new String[]{String.valueOf(studentId)});
+        if (cursor.moveToFirst()) {
+            String qrBase64 = cursor.getString(0);
+            cursor.close();
+            return qrBase64;
+        } else {
+            cursor.close();
+            return null;
+        }
+    }
+
 }
 

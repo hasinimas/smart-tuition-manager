@@ -12,39 +12,40 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#F5F5F5"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:padding="16dp"
+            android:background="#F5F5F5">
 
-            <!-- Title -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
-                android:layout_gravity="center"
-                android:layout_marginBottom="16dp"
-                android:background="@color/primary_one"
+                android:gravity="center"
                 android:text="Generate QR Code"
                 android:textColor="#212121"
                 android:textSize="22sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:background="@color/primary_one"
+                android:layout_marginBottom="16dp" />
 
-            <!-- Input for student ID -->
-            <EditText
+            <!-- Student ID display -->
+            <TextView
                 android:id="@+id/et_student_id"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:hint="Enter Student ID"
-                android:inputType="text" />
+                android:text="Student ID will appear here"
+                android:textSize="16sp"
+                android:padding="8dp"
+                android:focusable="false"
+                android:clickable="false"
+                android:layout_marginBottom="16dp"/>
 
-            <!-- Button to generate QR -->
+
             <Button
                 android:id="@+id/btn_generate_qr"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Generate QR Code" />
 
-            <!-- QR Code Display -->
             <ImageView
                 android:id="@+id/qr_image_view"
                 android:layout_width="300dp"
@@ -54,8 +55,34 @@
                 android:visibility="gone"
                 android:contentDescription="QR Code" />
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="16dp"
+                android:visibility="visible">
+
+                <Button
+                    android:id="@+id/btn_qr_save"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/save_qr"
+                    android:visibility="gone" />
+
+                <Button
+                    android:id="@+id/btn_qr_download"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginTop="8dp"
+                    android:text="Download"
+                    android:visibility="gone" />
+
+            </LinearLayout>
+
         </LinearLayout>
 
     </ScrollView>
-
 </FrameLayout>

@@ -17,6 +17,8 @@
     <string name="hello_blank_fragment" />
     <string name="notifications">Notifications</string>
     <string name="generate_qr_code_for_session">Generate QR Code for Session</string>
+    <string name="save_qr">Save</string>
+    <string name="download">Download</string>
 
 
 </resources>
