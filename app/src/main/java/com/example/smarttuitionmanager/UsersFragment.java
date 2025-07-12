@@ -1,9 +1,12 @@
 package com.example.smarttuitionmanager;
 
+import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,52 +23,28 @@ import android.widget.MultiAutoCompleteTextView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.Button;
+
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 import android.widget.TextView;
 import android.text.TextUtils;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link UsersFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.WriterException;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
+
+
 public class UsersFragment extends Fragment {
-
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    private String mParam1;
-    private String mParam2;
-
-    public UsersFragment() {
-        // Required empty public constructor
-    }
-
-    public static UsersFragment newInstance(String param1, String param2) {
-        UsersFragment fragment = new UsersFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -327,6 +306,20 @@ public class UsersFragment extends Fragment {
                                 etEmail.getText().toString().trim(),
                                 etPassword.getText().toString().trim()
                             );
+
+                            //  Generate QR content (e.g., studentId or email)
+                            String qrContent = String.valueOf(studentId);  // or include more like name|grade
+
+                            // Generate Bitmap
+                            Bitmap qrBitmap = generateQR(qrContent);
+
+                            // Convert Bitmap to Base64
+                            String qrBase64 = bitmapToBase64(qrBitmap);
+
+                            // Update student record with QR
+                            dbHelper.updateStudentQR(studentId, qrBase64);
+
+
                             for (String subject : selectedSubjects) {
                                 long subjectId = dbHelper.insertSubject(subject);
                                 dbHelper.insertStudentSubject(studentId, subjectId);
@@ -356,11 +349,19 @@ public class UsersFragment extends Fragment {
                                                     // Show QR dialog after student submit
                                                     LayoutInflater qrInflater = LayoutInflater.from(getContext());
                                                     View qrDialogView = qrInflater.inflate(R.layout.dialog_student_qr, null);
+
                                                     AlertDialog qrDialog = new AlertDialog.Builder(getContext())
                                                             .setView(qrDialogView)
                                                             .setCancelable(true)
                                                             .create();
                                                     qrDialog.show();
+                                                    Button btnSubmitQR = qrDialogView.findViewById(R.id.btn_submit_qr);
+                                                    btnSubmitQR.setOnClickListener(v1 -> {
+                                                        qrDialog.dismiss();
+                                                        onSubmitQRClicked(studentId);  //pass the student ID
+                                                    });
+
+
                                                 }
                                             }).start();
                                     }
@@ -376,7 +377,50 @@ public class UsersFragment extends Fragment {
         return view;
     }
 
+    public void onSubmitQRClicked(long studentId) {
+
+        Toast.makeText(getContext(), "Navigating to GenerateQRFragment", Toast.LENGTH_SHORT).show(); // to ensure
+        Bundle bundle = new Bundle();
+        bundle.putLong("studentId", studentId);  // pass ID
+
+        GenerateQRFragment qrFragment = new GenerateQRFragment();
+        qrFragment.setArguments(bundle);
+
+        requireActivity().getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragment_container, qrFragment)
+                .addToBackStack(null)
+                .commit();
+    }
+
+    public Bitmap generateQR(String content) {
+        try {
+            QRCodeWriter writer = new QRCodeWriter();
+            BitMatrix matrix = writer.encode(content, BarcodeFormat.QR_CODE, 300, 300);
+            Bitmap bitmap = Bitmap.createBitmap(300, 300, Bitmap.Config.RGB_565);
+            for (int x = 0; x < 300; x++) {
+                for (int y = 0; y < 300; y++) {
+                    bitmap.setPixel(x, y, matrix.get(x, y) ? Color.BLACK : Color.WHITE);
+                }
+            }
+            return bitmap;
+        } catch (WriterException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public String bitmapToBase64(Bitmap bitmap) {
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+        byte[] byteArray = stream.toByteArray();
+        return Base64.encodeToString(byteArray, Base64.DEFAULT);
+    }
+
+
+
     private StudentAdapter showStudentList(RecyclerView recyclerStudents) {
+
         MyDatabaseHelper dbHelper = new MyDatabaseHelper(getContext());
         java.util.List<MyDatabaseHelper.StudentWithSubjects> students = dbHelper.getAllStudentsWithSubjects();
         StudentAdapter adapter = new StudentAdapter(students);

@@ -32,7 +32,9 @@ public class MainActivity extends AppCompatActivity {
         if (savedInstanceState == null) {
             HomeFragment homeFragment = new HomeFragment();
             Bundle bundle = new Bundle();
+
             bundle.putString("role", "addmin"); // Change this to "student" or "admin" to test
+
             homeFragment.setArguments(bundle);
 
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, homeFragment).commit();
@@ -47,21 +49,20 @@ public class MainActivity extends AppCompatActivity {
             if (item.getItemId() == R.id.navHome)
             {
                 selectedFragment = new HomeFragment();
-            } else if (item.getItemId() == R.id.navAttendance)
+            } else if (item.getItemId() == R.id.navUsers)
+            {
+                selectedFragment = new UsersFragment();
+            }
+
+            else if (item.getItemId() == R.id.navSubjects)
             {
                 selectedFragment = new TeacherAttendanceFragment();
             }
 
 
-            else if (item.getItemId() == R.id.navSubjects)
+            else if (item.getItemId() == R.id.navReports)
             {
-                selectedFragment = new TeacherCourseGuide();
-            }
-
-
-            else if (item.getItemId() == R.id.navProfile)
-            {
-                selectedFragment = new ProfileFragment();
+                selectedFragment = new ReportsFragment();
             }
 
             if (selectedFragment != null) {

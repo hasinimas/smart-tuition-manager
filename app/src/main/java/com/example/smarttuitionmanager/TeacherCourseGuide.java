@@ -112,6 +112,13 @@ public class TeacherCourseGuide extends Fragment {
         List<String> subjectNames = new ArrayList<>();
         List<Integer> subjectIds = new ArrayList<>();
 
+
+        // Replace 1 with actual teacher_id from login/session
+        Cursor cursor = db.rawQuery("SELECT subject_id, name FROM Subject WHERE teacher_id = ?", new String[]{"1"});
+        while (cursor.moveToNext()) {
+            subjectIds.add(cursor.getInt(0));
+            subjectNames.add(cursor.getString(1));
+
         Cursor cursor = null;
         try {
             // ✅ Fixed: Use actual method from DB helper
@@ -136,6 +143,7 @@ public class TeacherCourseGuide extends Fragment {
             Toast.makeText(getContext(), "No subjects assigned to this teacher.", Toast.LENGTH_SHORT).show();
         } else {
             spinnerCourse.setEnabled(true);
+
         }
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, subjectNames);
