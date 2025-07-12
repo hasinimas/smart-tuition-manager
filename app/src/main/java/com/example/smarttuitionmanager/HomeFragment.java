@@ -1,14 +1,18 @@
 package com.example.smarttuitionmanager;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.GridLayout;
 import android.widget.TextView;
+
 import androidx.fragment.app.Fragment;
 
 import java.util.ArrayList;
@@ -18,6 +22,8 @@ public class HomeFragment extends Fragment {
     private LinearLayout layoutWelcome, layoutStats, layoutExtra;
     private GridLayout layoutActions;
     private String userRole;
+    private MyDatabaseHelper dbHelper;
+    private int userId;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -29,6 +35,12 @@ public class HomeFragment extends Fragment {
         layoutActions = view.findViewById(R.id.layout_actions);
         layoutExtra = view.findViewById(R.id.layout_extra);
 
+        dbHelper = new MyDatabaseHelper(getContext());
+
+        // Get user ID from SharedPreferences
+        SharedPreferences prefs = getActivity().getSharedPreferences("LoginPrefs", Context.MODE_PRIVATE);
+        userId = prefs.getInt("user_id", -1);
+
         // Get user role from arguments (default to "student")
         if (getArguments() != null) {
             userRole = getArguments().getString("role", "teacher");
@@ -37,21 +49,82 @@ public class HomeFragment extends Fragment {
         }
 
         // Load content based on role
-        if (userRole.equals("teacher")) {
-            loadTeacherContent();
-        } else if (userRole.equals("student")) {
-            loadStudentContent();
-        } else if (userRole.equals("admin")) {
-            loadAdminContent();
+        switch (userRole) {
+            case "teacher":
+                loadTeacherContent();
+                break;
+            case "admin":
+                loadAdminContent();
+                break;
+            case "student":
+            default:
+                loadStudentContent();
+                break;
         }
 
         return view;
     }
 
+    // --------------------- STUDENT ---------------------
+    private void loadStudentContent() {
+        setWelcome("Welcome, Student, Track your progress");
+
+        // Real stats
+        int subjectCount = getCount("SELECT COUNT(*) FROM STUDENT_COURSES WHERE student_id = ?", new String[]{String.valueOf(userId)});
+        int assignmentCount = getCount("SELECT COUNT(*) FROM ASSIGNMENTS WHERE Subject_id IN (SELECT subject_id FROM STUDENT_COURSES WHERE student_id = ?)", new String[]{String.valueOf(userId)});
+        int presentCount = getCount("SELECT COUNT(*) FROM ATTENDANCE WHERE student_id = ? AND status = 'Present'", new String[]{String.valueOf(userId)});
+        int totalAttendance = getCount("SELECT COUNT(*) FROM ATTENDANCE WHERE student_id = ?", new String[]{String.valueOf(userId)});
+        String attendanceRate = totalAttendance > 0 ? (presentCount * 100 / totalAttendance) + "%" : "0%";
+
+        layoutStats.removeAllViews();
+        addStatCard(attendanceRate, "Attendance");
+        addStatCard(String.valueOf(subjectCount), "Courses");
+        addStatCard(String.valueOf(assignmentCount), "Assignments");
+
+        layoutActions.removeAllViews();
+        addActionCard(R.drawable.ic_materials, "Course Materials");
+        addActionCard(R.drawable.ic_assignments, "Assignments");
+        addActionCard(R.drawable.ic_attendance, "Attendance");
+        addActionCard(R.drawable.ic_results, "Results");
+
+        layoutExtra.removeAllViews();
+        addClassCard("Mathematics", "Grade 10", "9:00 AM", "Now");
+        addClassCard("Physics", "Grade 11", "11:00 AM", "Upcoming");
+    }
+
+    // --------------------- ADMIN ---------------------
+    private void loadAdminContent() {
+        setWelcome("Welcome, Admin");
+
+        layoutStats.removeAllViews();
+        layoutActions.removeAllViews();
+        layoutExtra.removeAllViews();
+
+        int studentCount = getCount("SELECT COUNT(*) FROM USERS WHERE Role = 'Student'", null);
+        int teacherCount = getCount("SELECT COUNT(*) FROM USERS WHERE Role = 'Teacher'", null);
+        int courseCount = getCount("SELECT COUNT(*) FROM Subject", null);
+
+        addStatCard(String.valueOf(studentCount), "Students");
+        addStatCard(String.valueOf(teacherCount), "Teachers");
+        addStatCard(String.valueOf(courseCount), "Courses");
+        addStatCard("₹1.2L", "This Month");
+        addStatCard("₹8,000", "Pending Fees");
+
+        addActionCard(R.drawable.ic_manage_users, "Users");
+        addActionCard(R.drawable.ic_report, "Reports");
+        addActionCard(R.drawable.ic_notification, "Notify");
+        addActionCard(R.drawable.ic_approval, "Approvals");
+        addActionCard(R.drawable.ic_fees, "Fees Report");
+
+        addClassCard("System Health", "All Modules Active", "24x7", "Now");
+        addClassCard("Backup Scheduled", "Weekly Backup", "Sun 2 AM", "Upcoming");
+        addClassCard("Today’s Tasks", "Review Fee Logs", "3 Pending", "Now");
+    }
+
+    // --------------------- TEACHER (Demo Only) ---------------------
     private void loadTeacherContent() {
         setWelcome("Welcome, Teacher");
 
-        // Simulate dynamic stats data
         ArrayList<Stat> stats = new ArrayList<>();
         stats.add(new Stat("45", "Students"));
         stats.add(new Stat("5", "Classes"));
@@ -60,7 +133,6 @@ public class HomeFragment extends Fragment {
             addStatCard(stat.count, stat.title);
         }
 
-        // Simulate dynamic actions data
         ArrayList<Action> actions = new ArrayList<>();
         actions.add(new Action(R.drawable.ic_notification, "Notifications"));
         actions.add(new Action(R.drawable.ic_subjects, "Attendance"));
@@ -70,13 +142,22 @@ public class HomeFragment extends Fragment {
             addActionCard(action.iconRes, action.label);
         }
 
-        // Simulate dynamic class data
         ArrayList<ClassItem> classes = new ArrayList<>();
         classes.add(new ClassItem("Maths", "Grade 10", "9:00 AM", "Now"));
         classes.add(new ClassItem("Physics", "Grade 11", "11:00 AM", "Upcoming"));
         for (ClassItem classItem : classes) {
             addClassCard(classItem.subject, classItem.grade, classItem.time, classItem.status);
         }
+    }
+
+    // --------------------- UI Builders ---------------------
+    private void setWelcome(String title) {
+        layoutWelcome.removeAllViews();
+        TextView welcomeText = new TextView(getContext());
+        welcomeText.setText(title);
+        welcomeText.setTextSize(20);
+        welcomeText.setTypeface(null, Typeface.BOLD);
+        layoutWelcome.addView(welcomeText);
     }
 
     private void addStatCard(String count, String title) {
@@ -89,7 +170,6 @@ public class HomeFragment extends Fragment {
     private void addActionCard(int iconRes, String label) {
         View card = LayoutInflater.from(getContext()).inflate(R.layout.card_action, layoutActions, false);
         ((TextView) card.findViewById(R.id.action_label)).setText(label);
-        // Ensure the layout has an ImageView with id action_icon
         ImageView iconView = card.findViewById(R.id.action_icon);
         if (iconView != null) {
             iconView.setImageResource(iconRes);
@@ -106,38 +186,17 @@ public class HomeFragment extends Fragment {
         layoutExtra.addView(card);
     }
 
-    private void loadStudentContent() {
-        setWelcome("Welcome, Student");
-        addSimpleText(layoutStats, "Stats: Subjects, Progress");
-        addSimpleText(layoutActions, "Actions: View Materials, Submit Work");
-        addSimpleText(layoutExtra, "Extra: Upcoming Assignments");
+    private int getCount(String query, String[] args) {
+        Cursor cursor = dbHelper.getReadableDatabase().rawQuery(query, args);
+        int count = 0;
+        if (cursor.moveToFirst()) {
+            count = cursor.getInt(0);
+        }
+        cursor.close();
+        return count;
     }
 
-    private void loadAdminContent() {
-        setWelcome("Welcome, Admin");
-        addSimpleText(layoutStats, "Stats: Total Students, Teachers, Revenue");
-        addSimpleText(layoutActions, "Actions: Manage Users, Reports");
-        addSimpleText(layoutExtra, "Extra: System Overview");
-    }
-
-    private void setWelcome(String title) {
-        layoutWelcome.removeAllViews();
-        TextView welcomeText = new TextView(getContext());
-        welcomeText.setText(title);
-        welcomeText.setTextSize(20);
-        welcomeText.setTypeface(null, Typeface.BOLD);
-        layoutWelcome.addView(welcomeText);
-    }
-
-    private void addSimpleText(ViewGroup parent, String text) {
-        TextView textView = new TextView(getContext());
-        textView.setText(text);
-        textView.setTextSize(16);
-        textView.setPadding(0, 12, 0, 12);
-        parent.addView(textView);
-    }
-
-    // Data models
+    // --------------------- Data Models ---------------------
     private static class Stat {
         String count, title;
         Stat(String count, String title) {

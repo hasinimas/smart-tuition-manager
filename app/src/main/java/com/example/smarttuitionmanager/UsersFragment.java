@@ -34,6 +34,9 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
+
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;
@@ -57,8 +60,22 @@ public class UsersFragment extends Fragment {
         final View headerTeachers = view.findViewById(R.id.header_teachers);
         final RecyclerView recyclerStudents = view.findViewById(R.id.recycler_students);
         recyclerStudents.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
+        final EditText etSearch = view.findViewById(R.id.et_search);
         // Show students by default
-        showStudentList(recyclerStudents);
+        StudentAdapter[] studentAdapterRef = new StudentAdapter[1];
+        studentAdapterRef[0] = showStudentList(recyclerStudents);
+        etSearch.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (studentAdapterRef[0] != null) {
+                    studentAdapterRef[0].setFilter(s.toString());
+                }
+            }
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
 
         // Set click listeners
         tabTeachers.setOnClickListener(new View.OnClickListener() {
@@ -401,10 +418,13 @@ public class UsersFragment extends Fragment {
     }
 
 
-    private void showStudentList(RecyclerView recyclerStudents) {
+
+    private StudentAdapter showStudentList(RecyclerView recyclerStudents) {
+
         MyDatabaseHelper dbHelper = new MyDatabaseHelper(getContext());
         java.util.List<MyDatabaseHelper.StudentWithSubjects> students = dbHelper.getAllStudentsWithSubjects();
         StudentAdapter adapter = new StudentAdapter(students);
         recyclerStudents.setAdapter(adapter);
+        return adapter;
     }
 }

@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".TeacherCourseGuide">
+    tools:context=".StudentAssignment">
 
     <ScrollView
         android:background="#E7F8F6"
@@ -64,19 +65,18 @@
                     android:ellipsize="end" />
             </LinearLayout>
 
-             <TextView
-
-                android:text="Student Course Material"
-
- 
-                 android:textSize="25sp"
+            <!-- Title -->
+            <TextView
+                android:text="Assigment"
+                android:textSize="25sp"
                 android:textStyle="bold"
                 android:textColor="#00224B"
                 android:layout_marginBottom="24dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
-             <TextView
+            <!-- Select Course -->
+            <TextView
                 android:text="Select Course"
                 android:textColor="#000000"
                 android:layout_width="wrap_content"
@@ -89,17 +89,23 @@
                 android:backgroundTint="#000000"
                 android:layout_marginBottom="16dp" />
 
-            <LinearLayout
-                android:id="@+id/material_list"
+            <!-- Material Title -->
+            <TextView
+                android:text="Material Title"
+                android:textColor="#000000"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <EditText
+                android:id="@+id/editText_title"
+                android:hint="e.g., Lecture 1 Notes"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingTop="16dp"
-                android:paddingBottom="16dp">
-            </LinearLayout>
+                android:backgroundTint="#FFFFFF"
+                android:textColor="#000000"
+                android:layout_marginBottom="16dp" />
 
             <!-- Select PDF Button -->
-
             <Button
                 android:id="@+id/btn_select_pdf"
                 android:text="Select PDF"
@@ -109,7 +115,23 @@
                 android:backgroundTint="#B5C5E7"
                 android:textColor="#3F51B5" />
 
+            <!-- Selected File Text -->
+            <TextView
+                android:id="@+id/text_selected_file"
+                android:text="No file selected"
+                android:textColor="#6A0404"
+                android:layout_marginBottom="24dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
 
+            <!-- Upload Button -->
+            <Button
+                android:id="@+id/btn_upload"
+                android:text="Upload Material"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#027181"
+                android:textColor="#FFFFFF" />
 
         </LinearLayout>
     </ScrollView>
