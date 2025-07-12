@@ -17,6 +17,7 @@ import com.example.smarttuitionmanager.RegisterActivity;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
+import android.content.SharedPreferences;
 
 public class Login extends AppCompatActivity {
 
@@ -64,59 +65,37 @@ public class Login extends AppCompatActivity {
     }
 
     private void handleLogin() {
-        // Clear previous errors
+        // Clear previous errors on the input fields
         tilEmail.setError(null);
         tilPassword.setError(null);
 
+        // Get user input from EditTexts
         String email = etEmail.getText().toString().trim();
         String password = etPassword.getText().toString().trim();
 
-        // Validate inputs
-        if (TextUtils.isEmpty(email)) {
-            tilEmail.setError("Email is required");
-            return;
-        }
-
-        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            tilEmail.setError("Please enter a valid email address");
-            return;
-        }
-
-        if (TextUtils.isEmpty(password)) {
-            tilPassword.setError("Password is required");
-            return;
-        }
-
-        if (password.length() < 6) {
-            tilPassword.setError("Password must be at least 6 characters");
-            return;
-        }
-
-        // Show loading state
+        // Show loading state on the login button
         btnLogin.setEnabled(false);
         btnLogin.setText("Logging In...");
 
-        // Simulate login process (replace with real authentication later)
+        // Simulate a delay for login (e.g., network/database operation)
         btnLogin.postDelayed(() -> {
-            // Show success message
+            // Always allow login, regardless of email or password
             Toast.makeText(Login.this, "Login successful!", Toast.LENGTH_SHORT).show();
-
-            // Navigate to MainActivity
             Intent intent = new Intent(Login.this, MainActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
-            finish(); // Close Login screen
-        }, 2000);
+            finish();
+        }, 500);
     }
 
     private void handleGoogleSignIn() {
         Toast.makeText(this, "Google Log In clicked", Toast.LENGTH_SHORT).show();
-        // TODO: Implement Google Log In if needed
+
     }
 
     private void handleForgotPassword() {
         Toast.makeText(this, "Forgot Password clicked", Toast.LENGTH_SHORT).show();
-        // TODO: Navigate to forgot password screen
+
     }
 
     private void handleSignUp() {
