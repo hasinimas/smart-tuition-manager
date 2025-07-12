@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -18,7 +17,6 @@
             android:layout_height="wrap_content"
             android:gravity="center_horizontal">
 
-            <!-- Navigation Buttons -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -65,7 +63,6 @@
                     android:ellipsize="end" />
             </LinearLayout>
 
-            <!-- Title -->
             <TextView
                 android:text="Results"
                 android:textSize="25sp"
@@ -75,9 +72,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
-            <!-- Select Course -->
             <TextView
-                android:text="Select Course"
+                android:text="Select Subject"
                 android:textColor="#000000"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
@@ -89,49 +85,73 @@
                 android:backgroundTint="#000000"
                 android:layout_marginBottom="16dp" />
 
-            <!-- Material Title -->
             <TextView
-                android:text="Material Title"
+                android:text="Remark"
                 android:textColor="#000000"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
             <EditText
-                android:id="@+id/editText_title"
-                android:hint="e.g., Lecture 1 Notes"
+                android:id="@+id/editText_remark"
+            android:hint="e.g., Good effort, Needs improvement"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#FFFFFF"
+            android:textColor="#000000"
+            android:layout_marginBottom="16dp" />
+
+            <TextView
+                android:text="Select Student"
+                android:textColor="#000000"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <Spinner
+                android:id="@+id/spinner_students"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#000000"
+                android:layout_marginBottom="16dp" />
+
+            <TextView
+                android:text="Enter Marks"
+                android:textColor="#000000"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <EditText
+                android:id="@+id/editText_marks"
+                android:hint="e.g., 85"
+                android:inputType="number"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:backgroundTint="#FFFFFF"
                 android:textColor="#000000"
                 android:layout_marginBottom="16dp" />
 
-            <!-- Select PDF Button -->
             <Button
-                android:id="@+id/btn_select_pdf"
-                android:text="Select PDF"
+                android:id="@+id/btn_addresults"
+                android:text="Add Results"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
                 android:backgroundTint="#B5C5E7"
                 android:textColor="#3F51B5" />
 
-            <!-- Selected File Text -->
-            <TextView
-                android:id="@+id/text_selected_file"
-                android:text="No file selected"
-                android:textColor="#6A0404"
-                android:layout_marginBottom="24dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-
-            <!-- Upload Button -->
             <Button
-                android:id="@+id/btn_upload"
-                android:text="Upload Material"
+                android:id="@+id/btn_view"
+                android:text="View Results"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:backgroundTint="#027181"
                 android:textColor="#FFFFFF" />
+
+            <LinearLayout
+                android:id="@+id/results_list_layout"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="16dp" />
 
         </LinearLayout>
     </ScrollView>
