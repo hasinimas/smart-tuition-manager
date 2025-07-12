@@ -294,6 +294,7 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         return db.rawQuery("SELECT * FROM subject", null);
     }
+    // TEACHER SIDE
     // ✅ Insert a result
     public boolean insertResult(int studentId, int subjectId, int marks, String remark) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -323,8 +324,20 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
                 "JOIN subject sub ON r.Subject_id = sub.subject_id";
         return db.rawQuery(query, null);
     }
+    // ✅ Get results by specific student and subject
+    public Cursor getResultsByStudentAndSubject(int studentId, int subjectId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT s.first_name || ' ' || s.last_name AS Name, " +
+                "sub.name AS Subject_name, r.marks, r.remark " +
+                "FROM RESULTS r " +
+                "JOIN student s ON r.student_id = s.s_id " +
+                "JOIN subject sub ON r.Subject_id = sub.subject_id " +
+                "WHERE r.student_id = ? AND r.Subject_id = ?";
+        return db.rawQuery(query, new String[]{String.valueOf(studentId), String.valueOf(subjectId)});
+    }
 
-   // Check if a student exists with given email and password
+
+    // Check if a student exists with given email and password
     public boolean checkStudentLogin(String email, String password) {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery("SELECT s_id FROM student WHERE email=? AND password=?", new String[]{email, password});

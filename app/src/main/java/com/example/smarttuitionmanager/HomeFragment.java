@@ -69,12 +69,13 @@ public class HomeFragment extends Fragment {
     private void loadStudentContent() {
         setWelcome("Welcome, Student, Track your progress");
 
-        // Real stats
-        int subjectCount = getCount("SELECT COUNT(*) FROM STUDENT_COURSES WHERE student_id = ?", new String[]{String.valueOf(userId)});
-        int assignmentCount = getCount("SELECT COUNT(*) FROM ASSIGNMENTS WHERE Subject_id IN (SELECT subject_id FROM STUDENT_COURSES WHERE student_id = ?)", new String[]{String.valueOf(userId)});
-        int presentCount = getCount("SELECT COUNT(*) FROM ATTENDANCE WHERE student_id = ? AND status = 'Present'", new String[]{String.valueOf(userId)});
-        int totalAttendance = getCount("SELECT COUNT(*) FROM ATTENDANCE WHERE student_id = ?", new String[]{String.valueOf(userId)});
-        String attendanceRate = totalAttendance > 0 ? (presentCount * 100 / totalAttendance) + "%" : "0%";
+        // Real stats - using correct table names
+        int subjectCount = getCount("SELECT COUNT(*) FROM student_subject WHERE student_id = ?", new String[]{String.valueOf(userId)});
+        int assignmentCount = getCount("SELECT COUNT(*) FROM ASSIGNMENTS WHERE Subject_id IN (SELECT subject_id FROM student_subject WHERE student_id = ?)", new String[]{String.valueOf(userId)});
+        // Note: ATTENDANCE table doesn't exist in current schema, using placeholder values
+        int presentCount = 0; // Placeholder since ATTENDANCE table doesn't exist
+        int totalAttendance = 0; // Placeholder since ATTENDANCE table doesn't exist
+        String attendanceRate = "0%"; // Placeholder
 
         layoutStats.removeAllViews();
         addStatCard(attendanceRate, "Attendance");
@@ -100,9 +101,10 @@ public class HomeFragment extends Fragment {
         layoutActions.removeAllViews();
         layoutExtra.removeAllViews();
 
-        int studentCount = getCount("SELECT COUNT(*) FROM USERS WHERE Role = 'Student'", null);
-        int teacherCount = getCount("SELECT COUNT(*) FROM USERS WHERE Role = 'Teacher'", null);
-        int courseCount = getCount("SELECT COUNT(*) FROM Subject", null);
+        // Using correct table names from the database schema
+        int studentCount = getCount("SELECT COUNT(*) FROM student", null);
+        int teacherCount = getCount("SELECT COUNT(*) FROM teacher", null);
+        int courseCount = getCount("SELECT COUNT(*) FROM subject", null);
 
         addStatCard(String.valueOf(studentCount), "Students");
         addStatCard(String.valueOf(teacherCount), "Teachers");
@@ -187,13 +189,21 @@ public class HomeFragment extends Fragment {
     }
 
     private int getCount(String query, String[] args) {
-        Cursor cursor = dbHelper.getReadableDatabase().rawQuery(query, args);
-        int count = 0;
-        if (cursor.moveToFirst()) {
-            count = cursor.getInt(0);
+        try {
+            Cursor cursor = dbHelper.getReadableDatabase().rawQuery(query, args);
+            int count = 0;
+            if (cursor != null && cursor.moveToFirst()) {
+                count = cursor.getInt(0);
+            }
+            if (cursor != null) {
+                cursor.close();
+            }
+            return count;
+        } catch (Exception e) {
+            // Log the error and return 0 to prevent crashes
+            android.util.Log.e("HomeFragment", "Database query error: " + e.getMessage());
+            return 0;
         }
-        cursor.close();
-        return count;
     }
 
     // --------------------- Data Models ---------------------
