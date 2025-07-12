@@ -36,7 +36,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:itemBackground="@drawable/nav_no_ripple"
-        app:menu="@menu/navbar_teacher"
+        app:menu="@menu/navbar_admin"
         />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -32,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
         if (savedInstanceState == null) {
             HomeFragment homeFragment = new HomeFragment();
             Bundle bundle = new Bundle();
-            bundle.putString("role", "teacher"); // Change this to "student" or "admin" to test
+            bundle.putString("role", "addmin"); // Change this to "student" or "admin" to test
             homeFragment.setArguments(bundle);
 
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, homeFragment).commit();
@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
         bottomNav.setOnItemSelectedListener(item -> {
             Fragment selectedFragment = null;
             Bundle bundle = new Bundle();
-            bundle.putString("role", "teacher");
+            bundle.putString("role", "admin");
 
             if (item.getItemId() == R.id.navHome) {
                 selectedFragment = new HomeFragment();
