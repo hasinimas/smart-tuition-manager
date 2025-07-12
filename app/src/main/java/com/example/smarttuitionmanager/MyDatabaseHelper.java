@@ -15,7 +15,7 @@ import java.util.List;
 public class MyDatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "TuitionDB";
-    private static final int DATABASE_VERSION = 2;  // <-- increment this
+    private static final int DATABASE_VERSION = 3;  // <-- increment this
 
     public MyDatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -38,9 +38,13 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
                 "password TEXT NOT NULL)");
 
         // Subject table
+        // Subject table (updated with t_id as FK)
         db.execSQL("CREATE TABLE subject (" +
                 "subject_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                "name TEXT NOT NULL)");
+                "name TEXT NOT NULL, " +
+                "t_id INTEGER, " +
+                "FOREIGN KEY(t_id) REFERENCES teacher(t_id))");
+
 
         // Student-Subject mapping table (many-to-many)
         db.execSQL("CREATE TABLE student_subject (" +
@@ -50,7 +54,42 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
                 "FOREIGN KEY(student_id) REFERENCES student(s_id), " +
                 "FOREIGN KEY(subject_id) REFERENCES subject(subject_id))");
 
+        db.execSQL("CREATE TABLE RESULTS (" +
+                "result_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "student_id INTEGER, " +
+                "Subject_id INTEGER, " +
+                "marks INTEGER, " +
+                "remark TEXT, " +
+                "FOREIGN KEY(student_id) REFERENCES student(s_id), " +
+                "FOREIGN KEY(Subject_id) REFERENCES subject(subject_id))");
+
+        // Subject_MATERIALS table
+        db.execSQL("CREATE TABLE Subject_MATERIALS (" +
+                "material_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "Subject_id INTEGER, " +
+                "title TEXT, " +
+                "file_path TEXT, " +
+                "FOREIGN KEY(Subject_id) REFERENCES subject(subject_id))");
+
+        // ASSIGNMENTS table
+        db.execSQL("CREATE TABLE ASSIGNMENTS (" +
+                "assignment_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "Title TEXT, " +
+                "Description TEXT, " +
+                "Subject_id INTEGER, " +
+                "Deadline TEXT, " +
+                "FOREIGN KEY(Subject_id) REFERENCES subject(subject_id))");
+
+        //Teacher  table
+        db.execSQL("CREATE TABLE TEACHER (" +
+                "teacher_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "first_name TEXT, " +
+                "last_name TEXT, " +
+                "email INTEGER, " +
+                "password TEXT)");
+
     }
+
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
@@ -126,6 +165,44 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete("student_subject", "student_id=?", new String[]{String.valueOf(studentId)});
     }
+    public Cursor getAllStudents() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery("SELECT * FROM student", null);
+    }
+
+    public Cursor getAllSubjects() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery("SELECT * FROM subject", null);
+    }
+    // ✅ Insert a result
+    public boolean insertResult(int studentId, int subjectId, int marks, String remark) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("student_id", studentId);
+        values.put("Subject_id", subjectId);
+        values.put("marks", marks);
+        values.put("remark", remark);
+        long result = db.insert("RESULTS", null, values);
+        return result != -1;
+    }
+    // ✅ Get subjects assigned to a specific teacher
+    public Cursor getSubjectsByTeacherId(long teacherId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT * FROM subject WHERE t_id = ?";
+        return db.rawQuery(query, new String[]{String.valueOf(teacherId)});
+    }
+
+
+    // ✅ Get all results
+    public Cursor getAllResults() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT s.first_name || ' ' || s.last_name AS Name, " +
+                "sub.name AS Subject_name, r.marks, r.remark " +
+                "FROM RESULTS r " +
+                "JOIN student s ON r.student_id = s.s_id " +
+                "JOIN subject sub ON r.Subject_id = sub.subject_id";
+        return db.rawQuery(query, null);
+    }
 
     // Model class for student with subjects
     public static class StudentWithSubjects {
@@ -181,5 +258,6 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
         cs.close();
         return students;
     }
+
 }
 
