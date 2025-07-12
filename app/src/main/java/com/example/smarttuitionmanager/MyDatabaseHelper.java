@@ -15,7 +15,9 @@ import java.util.List;
 public class MyDatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "TuitionDB";
+
     private static final int DATABASE_VERSION = 4;  // <-- increment this
+
 
     public MyDatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -38,9 +40,13 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
                 "password TEXT NOT NULL)");
 
         // Subject table
+        // Subject table (updated with t_id as FK)
         db.execSQL("CREATE TABLE subject (" +
                 "subject_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                "name TEXT NOT NULL)");
+                "name TEXT NOT NULL, " +
+                "t_id INTEGER, " +
+                "FOREIGN KEY(t_id) REFERENCES teacher(t_id))");
+
 
         // Student-Subject mapping table (many-to-many)
         db.execSQL("CREATE TABLE student_subject (" +
@@ -49,6 +55,7 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
                 "subject_id INTEGER NOT NULL, " +
                 "FOREIGN KEY(student_id) REFERENCES student(s_id), " +
                 "FOREIGN KEY(subject_id) REFERENCES subject(subject_id))");
+
 
         // Teacher table
         db.execSQL("CREATE TABLE teacher (" +
@@ -69,6 +76,32 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
                 "last_name TEXT NOT NULL, " +
                 "email TEXT UNIQUE NOT NULL, " +
                 "password TEXT NOT NULL)");
+      
+              db.execSQL("CREATE TABLE RESULTS (" +
+                "result_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "student_id INTEGER, " +
+                "Subject_id INTEGER, " +
+                "marks INTEGER, " +
+                "remark TEXT, " +
+                "FOREIGN KEY(student_id) REFERENCES student(s_id), " +
+                "FOREIGN KEY(Subject_id) REFERENCES subject(subject_id))");
+
+        // Subject_MATERIALS table
+        db.execSQL("CREATE TABLE Subject_MATERIALS (" +
+                "material_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "Subject_id INTEGER, " +
+                "title TEXT, " +
+                "file_path TEXT, " +
+                "FOREIGN KEY(Subject_id) REFERENCES subject(subject_id))");
+
+        // ASSIGNMENTS table
+        db.execSQL("CREATE TABLE ASSIGNMENTS (" +
+                "assignment_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "Title TEXT, " +
+                "Description TEXT, " +
+                "Subject_id INTEGER, " +
+                "Deadline TEXT, " +
+                "FOREIGN KEY(Subject_id) REFERENCES subject(subject_id))");
 
         // Insert default admin if not exists
         db.execSQL("INSERT OR IGNORE INTO admin (first_name, last_name, email, password) VALUES ('new', 'admin', 'admin@gmail.com', 'admin123')");
@@ -169,7 +202,13 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
             teacherValues.put("password", teacher[7]);
             db.insert("teacher", null, teacherValues);
         }
+
+
+        
+
+
     }
+
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
@@ -245,6 +284,44 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
     public void removeAllSubjectsForStudent(long studentId) {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete("student_subject", "student_id=?", new String[]{String.valueOf(studentId)});
+    }
+    public Cursor getAllStudents() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery("SELECT * FROM student", null);
+    }
+
+    public Cursor getAllSubjects() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery("SELECT * FROM subject", null);
+    }
+    // ✅ Insert a result
+    public boolean insertResult(int studentId, int subjectId, int marks, String remark) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("student_id", studentId);
+        values.put("Subject_id", subjectId);
+        values.put("marks", marks);
+        values.put("remark", remark);
+        long result = db.insert("RESULTS", null, values);
+        return result != -1;
+    }
+    // ✅ Get subjects assigned to a specific teacher
+    public Cursor getSubjectsByTeacherId(long teacherId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT * FROM subject WHERE t_id = ?";
+        return db.rawQuery(query, new String[]{String.valueOf(teacherId)});
+    }
+
+
+    // ✅ Get all results
+    public Cursor getAllResults() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT s.first_name || ' ' || s.last_name AS Name, " +
+                "sub.name AS Subject_name, r.marks, r.remark " +
+                "FROM RESULTS r " +
+                "JOIN student s ON r.student_id = s.s_id " +
+                "JOIN subject sub ON r.Subject_id = sub.subject_id";
+        return db.rawQuery(query, null);
     }
 
    // Check if a student exists with given email and password
@@ -444,5 +521,29 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
         c.close();
         return admins;
     }
+
+
+    // -------------------------------------------- Attendance ---------------------------------------------------------------
+    public void updateStudentQR(long studentId, String base64QR) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("qr_img", base64QR);
+        db.update("student", values, "s_id = ?", new String[]{String.valueOf(studentId)});
+    }
+
+    public String getStudentQR(long studentId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT qr_img FROM student WHERE s_id = ?", new String[]{String.valueOf(studentId)});
+        if (cursor.moveToFirst()) {
+            String qrBase64 = cursor.getString(0);
+            cursor.close();
+            return qrBase64;
+        } else {
+            cursor.close();
+            return null;
+        }
+    }
+
+
 }
 

@@ -6,9 +6,56 @@
     tools:context=".SubjectsFragment">
 
     <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <RelativeLayout
+
+        android:id="@+id/subjectRoot"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:background="#EEF1FF"
+        tools:context=".SubjectsFragment">
 
+
+
+        <!-- Bottom Button Container -->
+        <LinearLayout
+            android:id="@+id/buttonContainer"
+            style="?android:attr/buttonBarStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_alignParentBottom="true"
+            android:layout_margin="16dp"
+            android:gravity="center"
+            android:weightSum="2">
+
+            <Button
+                android:id="@+id/btnAssignments"
+                style="?android:attr/buttonBarButtonStyle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Assignments"
+                android:textColor="#FFFFFF"
+                android:layout_marginBottom="10dp"
+                android:backgroundTint="#AAC4FF"
+                android:layout_marginEnd="8dp"
+                android:textSize="18sp"
+                android:padding="12dp" />
+
+            <Button
+                android:id="@+id/btnResults"
+                style="?android:attr/buttonBarButtonStyle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginBottom="10dp"
+
+                android:text="Results"
+                android:textColor="#FFFFFF"
+                android:backgroundTint="#B1B2FF"
+                android:layout_marginStart="8dp"
+                android:textSize="18sp"
+                android:padding="12dp" />
+        </LinearLayout>
+    </RelativeLayout>
 </FrameLayout>

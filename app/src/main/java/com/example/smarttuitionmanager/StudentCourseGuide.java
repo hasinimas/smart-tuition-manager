@@ -9,14 +9,15 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-
-import com.example.smarttuitionmanager.MyDatabaseHelper;
-import com.example.smarttuitionmanager.R;
+import androidx.fragment.app.FragmentTransaction;
 
 public class StudentCourseGuide extends Fragment {
 
@@ -27,7 +28,7 @@ public class StudentCourseGuide extends Fragment {
     private String mParam2;
 
     private LinearLayout materialListLayout;
-    private MyDatabaseHelper myDatabaseHelper;  // Your SQLiteOpenHelper subclass
+    private MyDatabaseHelper myDatabaseHelper;
 
     public StudentCourseGuide() {
         // Required empty public constructor
@@ -49,23 +50,51 @@ public class StudentCourseGuide extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
-        myDatabaseHelper = new MyDatabaseHelper(requireContext());  // Initialize DB helper here
+        myDatabaseHelper = new MyDatabaseHelper(requireContext());
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_student_course_guide, container, false);
     }
 
     @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         materialListLayout = view.findViewById(R.id.material_list);
-
         loadMaterialsFromDatabase();
+
+        // Navigation Buttons
+        Button cmaterialBtn = view.findViewById(R.id.Cmaterial);
+        Button assignmentBtn = view.findViewById(R.id.assignments);
+        Button resultsBtn = view.findViewById(R.id.results);
+
+        // Navigate to Course Materials (Already in this fragment)
+        cmaterialBtn.setOnClickListener(v -> {
+            Toast.makeText(getContext(), "Already viewing Course Materials", Toast.LENGTH_SHORT).show();
+        });
+
+        // Navigate to Assignments
+        assignmentBtn.setOnClickListener(v -> {
+            FragmentTransaction transaction = requireActivity()
+                    .getSupportFragmentManager()
+                    .beginTransaction();
+            transaction.replace(R.id.fragment_container, new StudentAssignment());
+            transaction.addToBackStack(null);
+            transaction.commit();
+        });
+
+        // Navigate to Results
+        resultsBtn.setOnClickListener(v -> {
+            FragmentTransaction transaction = requireActivity()
+                    .getSupportFragmentManager()
+                    .beginTransaction();
+            transaction.replace(R.id.fragment_container, new StudentResults());
+            transaction.addToBackStack(null);
+            transaction.commit();
+        });
     }
 
     private void loadMaterialsFromDatabase() {
@@ -101,6 +130,7 @@ public class StudentCourseGuide extends Fragment {
                 materialListLayout.addView(materialItem);
             } while (cursor.moveToNext());
         }
+
         cursor.close();
         db.close();
     }

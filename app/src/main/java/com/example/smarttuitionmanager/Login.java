@@ -96,6 +96,8 @@ public class Login extends AppCompatActivity {
     private void handleForgotPassword() {
         Toast.makeText(this, "Forgot Password clicked", Toast.LENGTH_SHORT).show();
 
+
+      
     }
 
     private void handleSignUp() {
