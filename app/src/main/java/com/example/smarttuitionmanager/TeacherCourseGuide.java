@@ -31,6 +31,9 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.List;
+
+
 
 public class TeacherCourseGuide extends Fragment {
 
@@ -44,15 +47,20 @@ public class TeacherCourseGuide extends Fragment {
 
     private static final String PREF_NAME = "LoginPrefs";
     private static final String KEY_TEACHER_ID = "teacherId";
+
     private static final int PICK_PDF_REQUEST = 100;
     private static final String TAG = "TeacherCourseGuide";
+
 
     private ArrayList<String> subjectNames;
     private ArrayList<Integer> subjectIdsList;
 
+
+
     public TeacherCourseGuide() {
         // Required empty public constructor
     }
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -66,8 +74,7 @@ public class TeacherCourseGuide extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_teacher_course_guide, container, false);
 
         // Initialize views
@@ -143,6 +150,7 @@ public class TeacherCourseGuide extends Fragment {
         return view;
     }
 
+
     private void loadAllSubjects() {
         // Get all subjects from database regardless of teacher assignment
         Cursor cursor = dbHelper.getAllSubjects();
@@ -159,6 +167,7 @@ public class TeacherCourseGuide extends Fragment {
             } while (cursor.moveToNext());
             cursor.close();
         }
+
     }
 
     @Override
@@ -166,6 +175,7 @@ public class TeacherCourseGuide extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == PICK_PDF_REQUEST && resultCode == Activity.RESULT_OK && data != null) {
+
             selectedPdfUri = data.getData();
             String fileName = getFileName(selectedPdfUri);
             textSelectedFile.setText(fileName);
@@ -224,12 +234,14 @@ public class TeacherCourseGuide extends Fragment {
                 resetForm();
             } else {
                 Toast.makeText(requireContext(), "Failed to upload material", Toast.LENGTH_SHORT).show();
+
             }
         } catch (Exception e) {
             Log.e(TAG, "Error uploading material: " + e.getMessage());
             Toast.makeText(requireContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
+
 
     private void resetForm() {
         editTextTitle.setText("");
@@ -238,3 +250,4 @@ public class TeacherCourseGuide extends Fragment {
         spinnerCourse.setSelection(0);
     }
 }
+
