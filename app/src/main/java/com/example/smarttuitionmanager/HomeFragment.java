@@ -69,12 +69,14 @@ public class HomeFragment extends Fragment {
     private void loadStudentContent() {
         setWelcome("Welcome, Student, Track your progress");
 
-        // Real stats
-        int subjectCount = getCount("SELECT COUNT(*) FROM STUDENT_COURSES WHERE student_id = ?", new String[]{String.valueOf(userId)});
-        int assignmentCount = getCount("SELECT COUNT(*) FROM ASSIGNMENTS WHERE Subject_id IN (SELECT subject_id FROM STUDENT_COURSES WHERE student_id = ?)", new String[]{String.valueOf(userId)});
-        int presentCount = getCount("SELECT COUNT(*) FROM ATTENDANCE WHERE student_id = ? AND status = 'Present'", new String[]{String.valueOf(userId)});
-        int totalAttendance = getCount("SELECT COUNT(*) FROM ATTENDANCE WHERE student_id = ?", new String[]{String.valueOf(userId)});
-        String attendanceRate = totalAttendance > 0 ? (presentCount * 100 / totalAttendance) + "%" : "0%";
+
+        // Real stats - using correct table names
+        int subjectCount = getCount("SELECT COUNT(*) FROM student_subject WHERE student_id = ?", new String[]{String.valueOf(userId)});
+        int assignmentCount = getCount("SELECT COUNT(*) FROM ASSIGNMENTS WHERE Subject_id IN (SELECT subject_id FROM student_subject WHERE student_id = ?)", new String[]{String.valueOf(userId)});
+        // Note: ATTENDANCE table doesn't exist in current schema, using placeholder values
+        int presentCount = 0; // Placeholder since ATTENDANCE table doesn't exist
+        int totalAttendance = 0; // Placeholder since ATTENDANCE table doesn't exist
+        String attendanceRate = "0%"; // Placeholder
 
         layoutStats.removeAllViews();
         addStatCard(attendanceRate, "Attendance");
@@ -100,9 +102,10 @@ public class HomeFragment extends Fragment {
         layoutActions.removeAllViews();
         layoutExtra.removeAllViews();
 
-        int studentCount = getCount("SELECT COUNT(*) FROM USERS WHERE Role = 'Student'", null);
-        int teacherCount = getCount("SELECT COUNT(*) FROM USERS WHERE Role = 'Teacher'", null);
-        int courseCount = getCount("SELECT COUNT(*) FROM Subject", null);
+        // Using correct table names from the database schema
+        int studentCount = getCount("SELECT COUNT(*) FROM student", null);
+        int teacherCount = getCount("SELECT COUNT(*) FROM teacher", null);
+        int courseCount = getCount("SELECT COUNT(*) FROM subject", null);
 
         addStatCard(String.valueOf(studentCount), "Students");
         addStatCard(String.valueOf(teacherCount), "Teachers");
@@ -116,6 +119,7 @@ public class HomeFragment extends Fragment {
         addActionCard(R.drawable.ic_approval, "Approvals");
         addActionCard(R.drawable.ic_fees, "Fees Report");
 
+        layoutExtra.removeAllViews();
         addClassCard("System Health", "All Modules Active", "24x7", "Now");
         addClassCard("Backup Scheduled", "Weekly Backup", "Sun 2 AM", "Upcoming");
         addClassCard("Today’s Tasks", "Review Fee Logs", "3 Pending", "Now");
@@ -150,21 +154,17 @@ public class HomeFragment extends Fragment {
         }
     }
 
-    // --------------------- UI Builders ---------------------
+    // --------------------- UI Methods ---------------------
     private void setWelcome(String title) {
-        layoutWelcome.removeAllViews();
-        TextView welcomeText = new TextView(getContext());
-        welcomeText.setText(title);
-        welcomeText.setTextSize(20);
-        welcomeText.setTypeface(null, Typeface.BOLD);
-        layoutWelcome.addView(welcomeText);
-    }
-
-    private void addStatCard(String count, String title) {
-        View card = LayoutInflater.from(getContext()).inflate(R.layout.card_stat, layoutStats, false);
-        ((TextView) card.findViewById(R.id.stat_count)).setText(count);
-        ((TextView) card.findViewById(R.id.stat_title)).setText(title);
-        layoutStats.addView(card);
+        if (layoutWelcome != null && getContext() != null) {
+            layoutWelcome.removeAllViews();
+            TextView welcomeText = new TextView(getContext());
+            welcomeText.setText(title);
+            welcomeText.setTextSize(20);
+            welcomeText.setTypeface(Typeface.DEFAULT_BOLD);
+            welcomeText.setPadding(16, 16, 16, 16);
+            layoutWelcome.addView(welcomeText);
+        }
     }
 
     private void addActionCard(int iconRes, String label) {
@@ -174,7 +174,56 @@ public class HomeFragment extends Fragment {
         if (iconView != null) {
             iconView.setImageResource(iconRes);
         }
+
+        card.setOnClickListener(v -> {
+            Fragment targetFragment = null;
+            switch (label) {
+                case "Course Materials":
+                    targetFragment = new StudentCourseGuide();
+                    break;
+                case "Assignments":
+                    targetFragment = new TeacherAssignment();
+                    break;
+                case "Attendance":
+                    targetFragment = new TeacherAttendanceFragment();
+                    break;
+                case "Results":
+                    targetFragment = new TeacherResults();
+                    break;
+                case "Users":
+                    targetFragment = new UsersFragment();
+                    break;
+                case "Reports":
+                    targetFragment = new ReportsFragment();
+                    break;
+                case "Notify":
+                    targetFragment = new TeacherResults(); // Change this if you have a NotificationFragment
+                    break;
+                case "Approvals":
+                    targetFragment = new TeacherResults(); // Replace with real ApprovalFragment if available
+                    break;
+                case "Fees Report":
+                    targetFragment = new ReportsFragment(); // Replace if you have a separate FeesFragment
+                    break;
+            }
+
+            if (targetFragment != null) {
+                getParentFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.fragment_container, targetFragment)
+                        .addToBackStack(null)
+                        .commit();
+            }
+        });
+
         layoutActions.addView(card);
+    }
+
+    private void addStatCard(String count, String title) {
+        View card = LayoutInflater.from(getContext()).inflate(R.layout.card_stat, layoutStats, false);
+        ((TextView) card.findViewById(R.id.stat_count)).setText(count);
+        ((TextView) card.findViewById(R.id.stat_title)).setText(title);
+        layoutStats.addView(card);
     }
 
     private void addClassCard(String subject, String grade, String time, String status) {
@@ -187,13 +236,21 @@ public class HomeFragment extends Fragment {
     }
 
     private int getCount(String query, String[] args) {
-        Cursor cursor = dbHelper.getReadableDatabase().rawQuery(query, args);
-        int count = 0;
-        if (cursor.moveToFirst()) {
-            count = cursor.getInt(0);
+        try {
+            Cursor cursor = dbHelper.getReadableDatabase().rawQuery(query, args);
+            int count = 0;
+            if (cursor != null && cursor.moveToFirst()) {
+                count = cursor.getInt(0);
+            }
+            if (cursor != null) {
+                cursor.close();
+            }
+            return count;
+        } catch (Exception e) {
+            // Log the error and return 0 to prevent crashes
+            android.util.Log.e("HomeFragment", "Database query error: " + e.getMessage());
+            return 0;
         }
-        cursor.close();
-        return count;
     }
 
     // --------------------- Data Models ---------------------
