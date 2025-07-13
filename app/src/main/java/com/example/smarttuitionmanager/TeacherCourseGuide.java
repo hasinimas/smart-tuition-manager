@@ -28,7 +28,6 @@ import java.util.List;
 
 
 // ... (all imports remain unchanged)
-
 public class TeacherCourseGuide extends Fragment {
 
     private Spinner spinnerCourse;
@@ -40,16 +39,10 @@ public class TeacherCourseGuide extends Fragment {
     private long loggedInTeacherId = -1;
 
     private static final String PREF_NAME = "LoginPrefs";
-    private static final String KEY_TEACHER_ID = "teacherId"; // this is t_id
+    private static final String KEY_TEACHER_ID = "teacherId";
+    private static final int REQUEST_CODE_SELECT_PDF = 100;
 
     public TeacherCourseGuide() {}
-
-    public static TeacherCourseGuide newInstance(String param1, String param2) {
-        TeacherCourseGuide fragment = new TeacherCourseGuide();
-        Bundle args = new Bundle();
-        fragment.setArguments(args);
-        return fragment;
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -66,8 +59,7 @@ public class TeacherCourseGuide extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_teacher_course_guide, container, false);
 
         spinnerCourse = view.findViewById(R.id.spinner_course);
@@ -108,20 +100,13 @@ public class TeacherCourseGuide extends Fragment {
     }
 
     private void loadSubjectsIntoSpinner() {
+
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         List<String> subjectNames = new ArrayList<>();
         List<Integer> subjectIds = new ArrayList<>();
-
-
-        // Replace 1 with actual teacher_id from login/session
-        Cursor cursor = db.rawQuery("SELECT subject_id, name FROM Subject WHERE teacher_id = ?", new String[]{"1"});
-        while (cursor.moveToNext()) {
-            subjectIds.add(cursor.getInt(0));
-            subjectNames.add(cursor.getString(1));
-
         Cursor cursor = null;
+
         try {
-            // ✅ Fixed: Use actual method from DB helper
             cursor = dbHelper.getSubjectsByTeacherId(loggedInTeacherId);
 
             if (cursor != null) {
@@ -143,7 +128,6 @@ public class TeacherCourseGuide extends Fragment {
             Toast.makeText(getContext(), "No subjects assigned to this teacher.", Toast.LENGTH_SHORT).show();
         } else {
             spinnerCourse.setEnabled(true);
-
         }
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, subjectNames);
@@ -172,13 +156,13 @@ public class TeacherCourseGuide extends Fragment {
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
         intent.setType("application/pdf");
         intent.addCategory(Intent.CATEGORY_OPENABLE);
-        startActivityForResult(intent, 100);
+        startActivityForResult(intent, REQUEST_CODE_SELECT_PDF);
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 100 && resultCode == Activity.RESULT_OK && data != null) {
+        if (requestCode == REQUEST_CODE_SELECT_PDF && resultCode == Activity.RESULT_OK && data != null) {
             selectedPdfUri = data.getData();
             String fileName = getFileName(selectedPdfUri);
             textSelectedFile.setText(fileName);
@@ -252,7 +236,10 @@ public class TeacherCourseGuide extends Fragment {
             InputStream inputStream = getContext().getContentResolver().openInputStream(uri);
             File dir = new File(getContext().getFilesDir(), "materials");
             if (!dir.exists()) dir.mkdirs();
-            File file = new File(dir, title.replaceAll("[^a-zA-Z0-9.-]", "_") + ".pdf");
+
+            String safeTitle = title.replaceAll("[^a-zA-Z0-9.-]", "_");
+            String fileName = safeTitle + "_" + System.currentTimeMillis() + ".pdf";
+            File file = new File(dir, fileName);
             OutputStream outputStream = new FileOutputStream(file);
 
             byte[] buffer = new byte[1024];
@@ -270,3 +257,4 @@ public class TeacherCourseGuide extends Fragment {
         }
     }
 }
+
