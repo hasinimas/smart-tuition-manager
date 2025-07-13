@@ -16,7 +16,7 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "TuitionDB";
 
-    private static final int DATABASE_VERSION = 3;  // <-- increment this
+    private static final int DATABASE_VERSION = 4;  // <-- increment this
 
 
     public MyDatabaseHelper(Context context) {
@@ -90,14 +90,39 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
                 "email INTEGER, " +
                 "password TEXT)");
 
+        //  Attendance table
+        db.execSQL("CREATE TABLE ATTENDANCE (" +
+                "attendance_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "student_id INTEGER NOT NULL, " +
+                "subject_id INTEGER NOT NULL, " +
+                "date TEXT NOT NULL, " +
+                "status TEXT CHECK(status IN ('Present','Absent')) NOT NULL, " +
+                "FOREIGN KEY(student_id) REFERENCES student(s_id), " +
+                "FOREIGN KEY(subject_id) REFERENCES subject(subject_id))");
+
+        // Notifications table
+        db.execSQL("CREATE TABLE NOTIFICATIONS (" +
+                "notification_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "student_id INTEGER NOT NULL, " +
+                "message TEXT NOT NULL, " +
+                "timestamp TEXT NOT NULL, " +
+                "FOREIGN KEY(student_id) REFERENCES student(s_id))");
+
     }
 
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
+        db.execSQL("DROP TABLE IF EXISTS student");
+        db.execSQL("DROP TABLE IF EXISTS teacher");
+        db.execSQL("DROP TABLE IF EXISTS subject");
+        db.execSQL("DROP TABLE IF EXISTS student_subject");
+        db.execSQL("DROP TABLE IF EXISTS RESULTS");
+        db.execSQL("DROP TABLE IF EXISTS Subject_MATERIALS");
+        db.execSQL("DROP TABLE IF EXISTS ASSIGNMENTS");
+        onCreate(db);
 
-        // Don't recreate anything now
     }
 
     // Insert a student and return the new student ID
@@ -281,6 +306,32 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
             cursor.close();
             return null;
         }
+    }
+
+    public boolean markAttendance(int studentId, int subjectId, String date, String status) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // Check if already marked
+        Cursor cursor = db.rawQuery(
+                "SELECT * FROM attendance WHERE student_id = ? AND subject_id = ? AND date = ?",
+                new String[]{String.valueOf(studentId), String.valueOf(subjectId), date});
+
+        boolean alreadyMarked = cursor.moveToFirst();
+        cursor.close();
+
+        if (alreadyMarked) {
+            return false; // Prevent duplicate entry
+        }
+
+        // Insert new attendance
+        ContentValues values = new ContentValues();
+        values.put("student_id", studentId);
+        values.put("subject_id", subjectId);
+        values.put("date", date);
+        values.put("status", status);
+        long result = db.insert("attendance", null, values);
+
+        return result != -1;
     }
 
 
