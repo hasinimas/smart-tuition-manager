@@ -4,19 +4,21 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
 import java.util.List;
 import java.util.ArrayList;
 
 public class TeacherAdapter extends RecyclerView.Adapter<TeacherAdapter.TeacherViewHolder> {
     private List<MyDatabaseHelper.Teacher> teachers;
     private List<MyDatabaseHelper.Teacher> teachersFull;
+    private OnTeacherClickListener listener;
 
     public interface OnTeacherClickListener {
         void onTeacherClick(MyDatabaseHelper.Teacher teacher);
     }
-    private OnTeacherClickListener listener;
 
     public TeacherAdapter(List<MyDatabaseHelper.Teacher> teachers, OnTeacherClickListener listener) {
         this.teachers = teachers;
@@ -78,6 +80,7 @@ public class TeacherAdapter extends RecyclerView.Adapter<TeacherAdapter.TeacherV
 
     public static class TeacherViewHolder extends RecyclerView.ViewHolder {
         TextView tvTId, tvFirstName, tvLastName, tvClass, tvSubject, tvPhone, tvIdNumber, tvEmail, tvPassword;
+
         public TeacherViewHolder(@NonNull View itemView) {
             super(itemView);
             tvTId = itemView.findViewById(R.id.tv_t_id);

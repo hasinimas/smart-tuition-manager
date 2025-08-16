@@ -31,9 +31,8 @@
                 android:id="@+id/et_student_id"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Student ID"
-                android:inputType="text"
-                android:enabled="false"
+                android:hint="Student ID (Scan QR or enter manually)"
+                android:inputType="number"
                 android:layout_marginBottom="16dp" />
 
             <Button
@@ -47,8 +46,22 @@
                 android:id="@+id/btn_mark_attendance"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Mark Attendance"
+                android:text="Mark Attendance (Present/Absent)"
                 android:enabled="false" />
+
+            <Button
+                android:id="@+id/btn_view_history"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="View Attendance History"
+                android:layout_marginTop="8dp" />
+
+            <Button
+                android:id="@+id/btn_clear_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Clear Today's List"
+                android:layout_marginTop="8dp" />
 
             <TextView
                 android:layout_width="match_parent"

@@ -53,10 +53,28 @@
                     android:textSize="16sp"
                     android:layout_marginBottom="8dp" />
                 <TextView
+                    android:id="@+id/tv_profile_grade"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Grade: "
+                    android:textSize="16sp"
+                    android:drawableStart="@drawable/ic_class"
+                    android:drawablePadding="8dp"
+                    android:layout_marginBottom="8dp" />
+                <TextView
                     android:id="@+id/tv_profile_phone"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Phone: "
+                    android:textSize="16sp"
+                    android:drawableStart="@drawable/ic_phone"
+                    android:drawablePadding="8dp"
+                    android:layout_marginBottom="8dp" />
+                <TextView
+                    android:id="@+id/tv_profile_guardian_phone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Guardian Phone: "
                     android:textSize="16sp"
                     android:drawableStart="@drawable/ic_phone"
                     android:drawablePadding="8dp"
@@ -87,6 +105,19 @@
                     android:text="Update"
                     android:backgroundTint="@color/primary"
                     android:textColor="@color/white"
+                    app:cornerRadius="16dp" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="16dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_profile_logout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Logout"
+                    android:backgroundTint="@color/button_secondary"
+                    android:textColor="@color/text_primary"
                     app:cornerRadius="16dp" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
@@ -131,10 +162,26 @@
                     android:layout_marginBottom="12dp" />
 
                 <EditText
+                    android:id="@+id/et_profile_grade"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Grade"
+                    android:layout_marginBottom="12dp"
+                    android:enabled="false" />
+
+                <EditText
                     android:id="@+id/et_profile_phone"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Phone Number"
+                    android:layout_marginBottom="12dp"
+                    android:inputType="phone" />
+
+                <EditText
+                    android:id="@+id/et_profile_guardian_phone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Guardian Phone Number"
                     android:layout_marginBottom="12dp"
                     android:inputType="phone" />
 

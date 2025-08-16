@@ -38,15 +38,19 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import java.util.List;
 import android.widget.HorizontalScrollView;
-
+import com.google.android.material.textfield.TextInputLayout;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 
+public class UsersFragment extends Fragment {
+    private static final String ARG_PARAM1 = "param1";
+    private static final String ARG_PARAM2 = "param2";
 
-
+    private String mParam1;
+    private String mParam2;
     private RecyclerView recyclerTeachers;
     private TeacherAdapter teacherAdapter;
 
@@ -71,9 +75,6 @@ import com.google.zxing.qrcode.QRCodeWriter;
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
     }
-
-public class UsersFragment extends Fragment {
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -197,6 +198,9 @@ public class UsersFragment extends Fragment {
                             .setView(dialogView)
                             .setCancelable(true)
                             .create();
+
+                    // Set up password toggle for teacher dialog
+                    setupPasswordToggle(dialogView, R.id.et_password);
 
                     dialogView.findViewById(R.id.btn_submit_teacher).setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -333,6 +337,9 @@ public class UsersFragment extends Fragment {
                             .setView(dialogView)
                             .setCancelable(true)
                             .create();
+
+                    // Set up password toggle for student dialog
+                    setupPasswordToggle(dialogView, R.id.et_password);
 
                     dialogView.findViewById(R.id.btn_submit_student).setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -509,6 +516,8 @@ public class UsersFragment extends Fragment {
 
 
 
+
+
     private StudentAdapter showStudentList(RecyclerView recyclerStudents) {
 
         MyDatabaseHelper dbHelper = new MyDatabaseHelper(getContext());
@@ -572,6 +581,25 @@ public class UsersFragment extends Fragment {
         });
 
         dialog.show();
+    }
+
+    private void setupPasswordToggle(View dialogView, int passwordEditTextId) {
+        TextInputLayout passwordLayout = dialogView.findViewById(R.id.til_password);
+        EditText passwordEditText = dialogView.findViewById(passwordEditTextId);
+        
+        // Set custom end icon drawable and click listener
+        passwordLayout.setEndIconDrawable(android.R.drawable.ic_menu_view);
+        passwordLayout.setEndIconOnClickListener(v -> {
+            if (passwordEditText.getInputType() == (android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD)) {
+                // Password is hidden, show it
+                passwordEditText.setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+                passwordLayout.setEndIconDrawable(android.R.drawable.ic_menu_close_clear_cancel);
+            } else {
+                // Password is visible, hide it
+                passwordEditText.setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                passwordLayout.setEndIconDrawable(android.R.drawable.ic_menu_view);
+            }
+        });
     }
 
     private void showUpdateTeacherDialog(MyDatabaseHelper.Teacher teacher) {

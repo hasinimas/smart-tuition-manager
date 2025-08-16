@@ -16,7 +16,7 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "TuitionDB";
 
-    private static final int DATABASE_VERSION = 4;  // <-- increment this
+    private static final int DATABASE_VERSION = 6;  // <-- increment this
 
 
     public MyDatabaseHelper(Context context) {
@@ -102,6 +102,35 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
                 "Subject_id INTEGER, " +
                 "Deadline TEXT, " +
                 "FOREIGN KEY(Subject_id) REFERENCES subject(subject_id))");
+
+        // Teacher Student Assign table
+        db.execSQL("CREATE TABLE teacher_student_assign (" +
+                "assign_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "teacher_name TEXT NOT NULL, " +
+                "student_name TEXT NOT NULL, " +
+                "subject TEXT NOT NULL, " +
+                "time TEXT NOT NULL, " +
+                "grade TEXT NOT NULL, " +
+                "day TEXT NOT NULL, " +
+                "status TEXT DEFAULT 'active')");
+
+        //  Attendance table
+        db.execSQL("CREATE TABLE attendance (" +
+                "attendance_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "student_id INTEGER NOT NULL, " +
+                "subject_id INTEGER NOT NULL, " +
+                "date TEXT NOT NULL, " +
+                "status TEXT CHECK(status IN ('Present','Absent')) NOT NULL, " +
+                "FOREIGN KEY(student_id) REFERENCES student(s_id), " +
+                "FOREIGN KEY(subject_id) REFERENCES subject(subject_id))");
+
+        // Notifications table
+        db.execSQL("CREATE TABLE NOTIFICATIONS (" +
+                "notification_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "student_id INTEGER NOT NULL, " +
+                "message TEXT NOT NULL, " +
+                "timestamp TEXT NOT NULL, " +
+                "FOREIGN KEY(student_id) REFERENCES student(s_id))");
 
         // Insert default admin if not exists
         db.execSQL("INSERT OR IGNORE INTO admin (first_name, last_name, email, password) VALUES ('new', 'admin', 'admin@gmail.com', 'admin123')");
@@ -210,11 +239,38 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
     }
 
 
-    @Override
+        @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         if (oldVersion < 3) {
             db.execSQL("CREATE TABLE IF NOT EXISTS admin (admin_id INTEGER PRIMARY KEY AUTOINCREMENT, first_name TEXT NOT NULL, last_name TEXT NOT NULL, email TEXT UNIQUE NOT NULL, password TEXT NOT NULL)");
             db.execSQL("INSERT OR IGNORE INTO admin (first_name, last_name, email, password) VALUES ('new', 'admin', 'admin@gmail.com', 'admin123')");
+        }
+        if (oldVersion < 5) {
+            // Create teacher student assign table
+            db.execSQL("CREATE TABLE IF NOT EXISTS teacher_student_assign (" +
+                    "assign_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    "teacher_name TEXT NOT NULL, " +
+                    "student_name TEXT NOT NULL, " +
+                "subject TEXT NOT NULL, " +
+                "time TEXT NOT NULL, " +
+                "grade TEXT NOT NULL, " +
+                "assigned_date TEXT NOT NULL, " +
+                "status TEXT DEFAULT 'active')");
+        }
+        if (oldVersion < 6) {
+            // Update teacher_student_assign table to change assigned_date to day
+            db.execSQL("ALTER TABLE teacher_student_assign ADD COLUMN day TEXT");
+            db.execSQL("UPDATE teacher_student_assign SET day = 'Sunday' WHERE assigned_date IS NOT NULL");
+            db.execSQL("ALTER TABLE teacher_student_assign DROP COLUMN assigned_date");
+            // Create attendance table
+            db.execSQL("CREATE TABLE IF NOT EXISTS attendance (" +
+                    "attendance_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    "student_id INTEGER NOT NULL, " +
+                    "subject_id INTEGER NOT NULL, " +
+                    "date TEXT NOT NULL, " +
+                    "status TEXT CHECK(status IN ('Present','Absent')) NOT NULL, " +
+                    "FOREIGN KEY(student_id) REFERENCES student(s_id), " +
+                    "FOREIGN KEY(subject_id) REFERENCES subject(subject_id))");
         }
     }
 
@@ -312,6 +368,71 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
         return db.rawQuery(query, new String[]{String.valueOf(teacherId)});
     }
 
+    // Get subjects by teacher name (alternative method)
+    public Cursor getSubjectsByTeacherName(String teacherName) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT s.* FROM subject s " +
+                      "JOIN teacher t ON s.name = t.subject " +
+                      "WHERE t.first_name || ' ' || t.last_name = ?";
+        return db.rawQuery(query, new String[]{teacherName});
+    }
+
+    // Get subject ID by subject name
+    public int getSubjectIdByName(String subjectName) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT subject_id FROM subject WHERE name = ?", 
+                                   new String[]{subjectName});
+        if (cursor != null && cursor.moveToFirst()) {
+            int subjectId = cursor.getInt(0);
+            cursor.close();
+            return subjectId;
+        }
+        if (cursor != null) cursor.close();
+        return -1;
+    }
+
+    // Get attendance records for a student
+    public Cursor getAttendanceForStudent(int studentId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT a.*, s.name as subject_name, a.date, a.status " +
+                      "FROM attendance a " +
+                      "JOIN subject s ON a.subject_id = s.subject_id " +
+                      "WHERE a.student_id = ? " +
+                      "ORDER BY a.date DESC";
+        return db.rawQuery(query, new String[]{String.valueOf(studentId)});
+    }
+
+    // Get attendance records for a subject on a specific date
+    public Cursor getAttendanceForSubjectOnDate(int subjectId, String date) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT a.*, s.first_name || ' ' || s.last_name as student_name " +
+                      "FROM attendance a " +
+                      "JOIN student s ON a.student_id = s.s_id " +
+                      "WHERE a.subject_id = ? AND a.date = ? " +
+                      "ORDER BY s.first_name, s.last_name";
+        return db.rawQuery(query, new String[]{String.valueOf(subjectId), date});
+    }
+
+    // Delete attendance records for a subject on a specific date
+    public int deleteAttendanceForSubjectOnDate(int subjectId, String date) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        return db.delete("attendance", 
+                        "subject_id = ? AND date = ?", 
+                        new String[]{String.valueOf(subjectId), date});
+    }
+
+    // Update attendance status for a specific student, subject, and date
+    public boolean updateAttendanceStatus(int studentId, int subjectId, String date, String newStatus) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("status", newStatus);
+        
+        int updatedRows = db.update("attendance", values,
+            "student_id = ? AND subject_id = ? AND date = ?",
+            new String[]{String.valueOf(studentId), String.valueOf(subjectId), date});
+        
+        return updatedRows > 0;
+    }
 
     // ✅ Get all results
     public Cursor getAllResults() {
@@ -331,6 +452,60 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
         boolean exists = cursor.moveToFirst();
         cursor.close();
         return exists;
+    }
+
+    // Get student ID for successful login
+    public long getStudentId(String email, String password) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT s_id FROM student WHERE email=? AND password=?", new String[]{email, password});
+        long studentId = -1;
+        if (cursor.moveToFirst()) {
+            studentId = cursor.getLong(0);
+        }
+        cursor.close();
+        return studentId;
+    }
+
+    // Check if a teacher exists with given email and password
+    public boolean checkTeacherLogin(String email, String password) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT t_id FROM teacher WHERE email=? AND password=?", new String[]{email, password});
+        boolean exists = cursor.moveToFirst();
+        cursor.close();
+        return exists;
+    }
+
+    // Get teacher ID for successful login
+    public long getTeacherId(String email, String password) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT t_id FROM teacher WHERE email=? AND password=?", new String[]{email, password});
+        long teacherId = -1;
+        if (cursor.moveToFirst()) {
+            teacherId = cursor.getLong(0);
+        }
+        cursor.close();
+        return teacherId;
+    }
+
+    // Check if an admin exists with given email and password
+    public boolean checkAdminLogin(String email, String password) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT admin_id FROM admin WHERE email=? AND password=?", new String[]{email, password});
+        boolean exists = cursor.moveToFirst();
+        cursor.close();
+        return exists;
+    }
+
+    // Get admin ID for successful login
+    public long getAdminId(String email, String password) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT admin_id FROM admin WHERE email=? AND password=?", new String[]{email, password});
+        long adminId = -1;
+        if (cursor.moveToFirst()) {
+            adminId = cursor.getLong(0);
+        }
+        cursor.close();
+        return adminId;
     }
 
     // Insert a teacher and return the new teacher ID
@@ -493,6 +668,28 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
         return teachers;
     }
 
+    // Get all teachers as Cursor
+    public Cursor getAllTeachersCursor() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery("SELECT * FROM teacher ORDER BY first_name, last_name", null);
+    }
+
+    // Get teachers by subject and grade
+    public Cursor getTeachersBySubjectAndGrade(String subject, String grade) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery(
+            "SELECT * FROM teacher WHERE subject = ? AND class = ? ORDER BY first_name, last_name",
+            new String[]{subject, grade});
+    }
+
+    // Get teachers by subject only (fallback when no exact grade match)
+    public Cursor getTeachersBySubject(String subject) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery(
+            "SELECT * FROM teacher WHERE subject = ? ORDER BY first_name, last_name",
+            new String[]{subject});
+    }
+
     // Model class for admin
     public static class Admin {
         public long adminId;
@@ -544,6 +741,246 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
+    // -------------------------------------------- Teacher Student Assign Methods ---------------------------------------------------------------
+
+    // Assign a teacher to a student with details
+    public long assignTeacherToStudent(String teacherName, String studentName, String subject, String time, String grade, String day) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("teacher_name", teacherName);
+        values.put("student_name", studentName);
+        values.put("subject", subject);
+        values.put("time", time);
+        values.put("grade", grade);
+        values.put("day", day);
+        values.put("status", "active");
+        
+        return db.insert("teacher_student_assign", null, values);
+    }
+
+    // Remove a teacher assignment from a student
+    public boolean removeTeacherFromStudent(String teacherName, String studentName) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        int deletedRows = db.delete("teacher_student_assign", 
+            "teacher_name = ? AND student_name = ?", 
+            new String[]{teacherName, studentName});
+        return deletedRows > 0;
+    }
+
+    // Get all assignments for a specific student
+    public Cursor getAssignmentsForStudent(String studentName) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery(
+            "SELECT * FROM teacher_student_assign " +
+            "WHERE student_name = ? AND status = 'active' " +
+            "ORDER BY day ASC",
+            new String[]{studentName});
+    }
+
+    // Get all assignments for a specific teacher
+    public Cursor getAssignmentsForTeacher(String teacherName) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery(
+            "SELECT * FROM teacher_student_assign " +
+            "WHERE teacher_name = ? AND status = 'active' " +
+            "ORDER BY day ASC",
+            new String[]{teacherName});
+    }
+
+    // Get all assignments
+    public Cursor getAllAssignments() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery(
+            "SELECT * FROM teacher_student_assign " +
+            "WHERE status = 'active' " +
+            "ORDER BY day ASC",
+            null);
+    }
+
+    // Get assignments by subject
+    public Cursor getAssignmentsBySubject(String subject) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery(
+            "SELECT * FROM teacher_student_assign " +
+            "WHERE subject = ? AND status = 'active' " +
+            "ORDER BY day ASC",
+            new String[]{subject});
+    }
+
+    // Get assignments by grade
+    public Cursor getAssignmentsByGrade(String grade) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery(
+            "SELECT * FROM teacher_student_assign " +
+            "WHERE grade = ? AND status = 'active' " +
+            "ORDER BY day ASC",
+            new String[]{grade});
+    }
+
+    // Check if a teacher is already assigned to a student
+    public boolean isTeacherAssignedToStudent(String teacherName, String studentName) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(
+            "SELECT COUNT(*) FROM teacher_student_assign " +
+            "WHERE teacher_name = ? AND student_name = ? AND status = 'active'",
+            new String[]{teacherName, studentName});
+        
+        if (cursor.moveToFirst()) {
+            int count = cursor.getInt(0);
+            cursor.close();
+            return count > 0;
+        }
+        cursor.close();
+        return false;
+    }
+
+    // Check if there's a time conflict for a teacher on a specific day and time
+    public boolean hasTimeConflict(String teacherName, String day, String time) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(
+            "SELECT COUNT(*) FROM teacher_student_assign " +
+            "WHERE teacher_name = ? AND day = ? AND time = ? AND status = 'active'",
+            new String[]{teacherName, day, time});
+        
+        if (cursor.moveToFirst()) {
+            int count = cursor.getInt(0);
+            cursor.close();
+            return count > 0;
+        }
+        cursor.close();
+        return false;
+    }
+
+    // Check if there's a time conflict for a student on a specific day and time
+    public boolean hasStudentTimeConflict(String studentName, String day, String time) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(
+            "SELECT COUNT(*) FROM teacher_student_assign " +
+            "WHERE student_name = ? AND day = ? AND time = ? AND status = 'active'",
+            new String[]{studentName, day, time});
+        
+        if (cursor.moveToFirst()) {
+            int count = cursor.getInt(0);
+            cursor.close();
+            return count > 0;
+        }
+        cursor.close();
+        return false;
+    }
+
+    // Get assignment details by ID
+    public Cursor getAssignmentById(long assignId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery(
+            "SELECT * FROM teacher_student_assign " +
+            "WHERE assign_id = ?",
+            new String[]{String.valueOf(assignId)});
+    }
+
+    // Update assignment details
+    public boolean updateAssignment(long assignId, String teacherName, String studentName, String subject, String time, String grade, String day) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("teacher_name", teacherName);
+        values.put("student_name", studentName);
+        values.put("subject", subject);
+        values.put("time", time);
+        values.put("grade", grade);
+        values.put("day", day);
+        
+        int updatedRows = db.update("teacher_student_assign", values,
+            "assign_id = ?",
+            new String[]{String.valueOf(assignId)});
+        
+        return updatedRows > 0;
+    }
+
+    // Update assignment status (active/inactive)
+    public boolean updateAssignmentStatus(long assignId, String status) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("status", status);
+        
+        int updatedRows = db.update("teacher_student_assign", values,
+            "assign_id = ?",
+            new String[]{String.valueOf(assignId)});
+        
+        return updatedRows > 0;
+    }
+
+    // Delete assignment by ID
+    public boolean deleteAssignment(long assignId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        int deletedRows = db.delete("teacher_student_assign", 
+            "assign_id = ?", 
+            new String[]{String.valueOf(assignId)});
+        return deletedRows > 0;
+    }
+
+    // Get unique teachers from assignments
+    public Cursor getUniqueTeachers() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery(
+            "SELECT DISTINCT teacher_name FROM teacher_student_assign " +
+            "WHERE status = 'active' " +
+            "ORDER BY teacher_name",
+            null);
+    }
+
+    // Get unique students from assignments
+    public Cursor getUniqueStudents() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery(
+            "SELECT DISTINCT student_name FROM teacher_student_assign " +
+            "WHERE status = 'active' " +
+            "ORDER BY student_name",
+            null);
+    }
+
+    // Get unique subjects from assignments
+    public Cursor getUniqueSubjects() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery(
+            "SELECT DISTINCT subject FROM teacher_student_assign " +
+            "WHERE status = 'active' " +
+            "ORDER BY subject",
+            null);
+    }
+
+    // Get unique grades from assignments
+    public Cursor getUniqueGrades() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery(
+            "SELECT DISTINCT grade FROM teacher_student_assign " +
+            "WHERE status = 'active' " +
+            "ORDER BY grade",
+            null);
+    }
+
+    public boolean markAttendance(int studentId, int subjectId, String date, String status) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // Check if already marked
+        Cursor cursor = db.rawQuery(
+                "SELECT * FROM attendance WHERE student_id = ? AND subject_id = ? AND date = ?",
+                new String[]{String.valueOf(studentId), String.valueOf(subjectId), date});
+
+        boolean alreadyMarked = cursor.moveToFirst();
+        cursor.close();
+
+        if (alreadyMarked) {
+            return false; // Prevent duplicate entry
+        }
+
+        // Insert new attendance
+        ContentValues values = new ContentValues();
+        values.put("student_id", studentId);
+        values.put("subject_id", subjectId);
+        values.put("date", date);
+        values.put("status", status);
+        long result = db.insert("attendance", null, values);
+
+        return result != -1;
+    }
 
 }
-
