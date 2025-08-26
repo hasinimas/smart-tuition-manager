@@ -14,6 +14,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -21,7 +26,6 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
@@ -37,11 +41,11 @@ import java.util.List;
 
 public class TeacherCourseGuide extends Fragment {
 
-    private Spinner spinnerCourse;
+    private TextView textTeacherSubject;
     private EditText editTextTitle;
     private TextView textSelectedFile;
     private Uri selectedPdfUri;
-    private int selectedSubjectId = -1;
+    private String teacherSubject = "";
     private MyDatabaseHelper dbHelper;
     private long loggedInTeacherId = -1;
 
@@ -77,8 +81,12 @@ public class TeacherCourseGuide extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_teacher_course_guide, container, false);
 
+
+        textTeacherSubject = view.findViewById(R.id.text_teacher_subject);
+
         // Initialize views
-        spinnerCourse = view.findViewById(R.id.spinner_course);
+     //   spinnerCourse = view.findViewById(R.id.spinner_course);
+
         editTextTitle = view.findViewById(R.id.editText_title);
         textSelectedFile = view.findViewById(R.id.text_selected_file);
         Button btnSelectPdf = view.findViewById(R.id.btn_select_pdf);
@@ -86,9 +94,14 @@ public class TeacherCourseGuide extends Fragment {
         Button assignmentsBtn = view.findViewById(R.id.assignments);
         Button resultsBtn = view.findViewById(R.id.results);
 
-        // Initialize lists for spinner data
-        subjectNames = new ArrayList<>();
-        subjectIdsList = new ArrayList<>();
+
+        if (loggedInTeacherId != -1) {
+            loadTeacherSubject();
+        } else {
+            Toast.makeText(getContext(), "Cannot load subject: Teacher not identified.", Toast.LENGTH_LONG).show();
+            textTeacherSubject.setText("Error: Teacher not found");
+        }
+
 
         // Load all available subjects into spinner
         loadAllSubjects();
@@ -151,22 +164,38 @@ public class TeacherCourseGuide extends Fragment {
     }
 
 
-    private void loadAllSubjects() {
-        // Get all subjects from database regardless of teacher assignment
-        Cursor cursor = dbHelper.getAllSubjects();
-
-        if (cursor != null && cursor.moveToFirst()) {
-            do {
-                int subjectId = cursor.getInt(cursor.getColumnIndexOrThrow("subject_id"));
-                String subjectName = cursor.getString(cursor.getColumnIndexOrThrow("name"));
-
-                subjectIdsList.add(subjectId);
-                subjectNames.add(subjectName);
-
-                Log.d(TAG, "Loaded subject: " + subjectName + " (ID: " + subjectId + ")");
-            } while (cursor.moveToNext());
-            cursor.close();
+    private void loadTeacherSubject() {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Cursor cursor = null;
+        
+        try {
+            // Get teacher's subject directly from teacher table
+            cursor = db.rawQuery("SELECT subject FROM teacher WHERE t_id = ?", 
+                                new String[]{String.valueOf(loggedInTeacherId)});
+            
+            if (cursor != null && cursor.moveToFirst()) {
+                teacherSubject = cursor.getString(cursor.getColumnIndexOrThrow("subject"));
+                textTeacherSubject.setText(teacherSubject);
+                Log.d("TeacherCourseGuide", "Teacher Subject: " + teacherSubject);
+            } else {
+                textTeacherSubject.setText("No subject assigned");
+                Toast.makeText(getContext(), "No subject assigned to this teacher.", Toast.LENGTH_SHORT).show();
+            }
+        } catch (Exception e) {
+            Log.e("TeacherCourseGuide", "Error loading teacher subject: " + e.getMessage(), e);
+            Toast.makeText(getContext(), "Error loading teacher subject: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            textTeacherSubject.setText("Error loading subject");
+        } finally {
+            if (cursor != null) cursor.close();
         }
+    }
+
+    private void selectPdfFromDevice() {
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.setType("application/pdf");
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        startActivityForResult(intent, 100);
+
 
     }
 
@@ -210,12 +239,12 @@ public class TeacherCourseGuide extends Fragment {
             inputStream.read(pdfBytes);
             inputStream.close();
 
-            // Save to internal storage
-            String fileName = "material_" + System.currentTimeMillis() + ".pdf";
-            File file = new File(requireContext().getFilesDir(), fileName);
-            try (OutputStream outputStream = new FileOutputStream(file)) {
-                outputStream.write(pdfBytes);
-            }
+
+        if (teacherSubject.isEmpty()) {
+            Toast.makeText(getContext(), "No subject assigned to teacher.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
 
             // Save to database
             String title = editTextTitle.getText().toString().trim();
@@ -227,7 +256,38 @@ public class TeacherCourseGuide extends Fragment {
             values.put("title", title);
             values.put("file_path", filePath);
 
-            long result = db.insert("Subject_MATERIALS", null, values);
+        // Get the subject ID for the teacher's subject
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        Cursor cursor = db.rawQuery("SELECT subject_id FROM subject WHERE name = ?", 
+                                   new String[]{teacherSubject});
+        
+        int subjectId = -1;
+        if (cursor != null && cursor.moveToFirst()) {
+            subjectId = cursor.getInt(cursor.getColumnIndexOrThrow("subject_id"));
+        }
+        cursor.close();
+
+        if (subjectId == -1) {
+            Toast.makeText(getContext(), "Subject not found in database.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        ContentValues values = new ContentValues();
+        values.put("Subject_id", subjectId);
+        values.put("title", title);
+        values.put("file_path", filePath);
+        long result = db.insert("Subject_MATERIALS", null, values);
+
+        if (result != -1) {
+            Toast.makeText(getContext(), "Material uploaded successfully", Toast.LENGTH_SHORT).show();
+            editTextTitle.setText("");
+            textSelectedFile.setText("No file selected");
+            selectedPdfUri = null;
+        } else {
+            Toast.makeText(getContext(), "Upload failed", Toast.LENGTH_SHORT).show();
+        }
+    }
+
 
             if (result != -1) {
                 Toast.makeText(requireContext(), "Material uploaded successfully", Toast.LENGTH_SHORT).show();

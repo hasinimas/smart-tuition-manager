@@ -18,6 +18,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import android.content.SharedPreferences;
 
 public class StudentCourseGuide extends Fragment {
 
@@ -65,6 +66,34 @@ public class StudentCourseGuide extends Fragment {
 
         materialListLayout = view.findViewById(R.id.material_list);
         loadMaterialsFromDatabase();
+
+        // Show logged-in student's subject(s)
+        TextView subjectTextView = view.findViewById(R.id.text_student_subject);
+        SharedPreferences prefs = requireContext().getSharedPreferences("LoginPrefs", 0);
+        long studentId = prefs.getLong("user_id", -1);
+        if (studentId != -1) {
+            SQLiteDatabase db = myDatabaseHelper.getReadableDatabase();
+            Cursor cursor = db.rawQuery(
+                "SELECT sub.name FROM subject sub " +
+                "JOIN student_subject ss ON sub.subject_id = ss.subject_id " +
+                "WHERE ss.student_id = ?",
+                new String[]{String.valueOf(studentId)}
+            );
+            StringBuilder subjects = new StringBuilder();
+            while (cursor.moveToNext()) {
+                if (subjects.length() > 0) subjects.append(", ");
+                subjects.append(cursor.getString(0));
+            }
+            cursor.close();
+            db.close();
+            if (subjects.length() > 0) {
+                subjectTextView.setText(subjects.toString());
+            } else {
+                subjectTextView.setText("No subjects assigned");
+            }
+        } else {
+            subjectTextView.setText("Error: Student not found");
+        }
 
         // Navigation Buttons
         Button cmaterialBtn = view.findViewById(R.id.Cmaterial);

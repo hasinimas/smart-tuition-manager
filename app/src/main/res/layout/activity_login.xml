@@ -95,7 +95,7 @@
                     android:id="@+id/til_password"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="24dp"
+                    android:layout_marginBottom="16dp"
                     android:hint="@string/password_hint"
                     app:hintTextColor="@color/primary"
                     app:boxStrokeColor="@color/input_border"
@@ -106,7 +106,7 @@
                     app:boxCornerRadiusBottomEnd="8dp"
                     app:startIconDrawable="@drawable/ic_lock"
                     app:startIconTint="@color/text_secondary"
-                    app:endIconMode="password_toggle"
+                    app:endIconMode="custom"
                     app:endIconTint="@color/text_secondary">
 
                     <com.google.android.material.textfield.TextInputEditText
@@ -117,6 +117,58 @@
                         android:textColor="@color/text_primary" />
 
                 </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- User Type Selection -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Select User Type:"
+                    android:textColor="@color/text_primary"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="12dp" />
+
+                <RadioGroup
+                    android:id="@+id/rg_user_type"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="24dp">
+
+                    <RadioButton
+                        android:id="@+id/rb_student"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Student"
+                        android:textColor="@color/text_primary"
+                        android:textSize="14sp"
+                        android:checked="true"
+                        android:buttonTint="@color/primary"
+                        android:layout_marginEnd="8dp" />
+
+                    <RadioButton
+                        android:id="@+id/rb_teacher"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Teacher"
+                        android:textColor="@color/text_primary"
+                        android:textSize="14sp"
+                        android:buttonTint="@color/primary"
+                        android:layout_marginEnd="8dp" />
+
+                    <RadioButton
+                        android:id="@+id/rb_admin"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Admin"
+                        android:textColor="@color/text_primary"
+                        android:textSize="14sp"
+                        android:buttonTint="@color/primary" />
+
+                </RadioGroup>
 
                 <!-- Forgot Password -->
                 <TextView
