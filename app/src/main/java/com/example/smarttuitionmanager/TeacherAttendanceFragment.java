@@ -32,6 +32,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 import android.app.AlertDialog;
 
+
 public class TeacherAttendanceFragment extends Fragment {
 
     private static final int CAMERA_REQUEST_CODE = 101;
@@ -147,6 +148,7 @@ public class TeacherAttendanceFragment extends Fragment {
     private void markAttendance() {
         String studentIdStr = etStudentId.getText().toString().trim();
 
+
         if (studentIdStr.isEmpty()) {
             Toast.makeText(getContext(), "Please scan Student ID", Toast.LENGTH_SHORT).show();
             return;
@@ -208,12 +210,14 @@ public class TeacherAttendanceFragment extends Fragment {
 
             if (inserted) {
                 String record = "✔ " + studentName + " - " + status + " (" + getCurrentTime() + ")";
+
                 attendanceList.add(record);
                 adapter.notifyDataSetChanged();
 
                 lvAttendanceList.post(() -> lvAttendanceList.setSelection(adapter.getCount() - 1));
                 etStudentId.setText("");
                 btnMarkAttendance.setEnabled(false);
+
 
                 showSuccessSnackbar("Attendance marked: " + studentName + " - " + status);
             } else {
@@ -236,6 +240,7 @@ public class TeacherAttendanceFragment extends Fragment {
             int subjectId = cursor.getInt(cursor.getColumnIndexOrThrow("subject_id"));
             cursor.close();
             return subjectId;
+
         }
         if (cursor != null) cursor.close();
         
@@ -256,6 +261,17 @@ public class TeacherAttendanceFragment extends Fragment {
             Log.e("TeacherAttendance", "Error getting teacher subject: " + e.getMessage());
         }
         
+        return -1;
+    }
+
+    private int getSubjectIdForTeacher(int teacherId) {
+        MyDatabaseHelper dbHelper = new MyDatabaseHelper(requireContext());
+        Cursor cursor = dbHelper.getSubjectsByTeacherId(teacherId);
+        if (cursor != null && cursor.moveToFirst()) {
+            int subjectId = cursor.getInt(cursor.getColumnIndexOrThrow("subject_id"));
+            cursor.close();
+            return subjectId;
+        }
         return -1;
     }
 
@@ -335,6 +351,7 @@ public class TeacherAttendanceFragment extends Fragment {
     }
 
     private int getLoggedInTeacherId() {
+
         // Get teacher ID from SharedPreferences
         SharedPreferences prefs = requireContext().getSharedPreferences("LoginPrefs", Context.MODE_PRIVATE);
         return (int) prefs.getLong("teacherId", -1);
@@ -454,3 +471,4 @@ public class TeacherAttendanceFragment extends Fragment {
         }
     }
 }
+

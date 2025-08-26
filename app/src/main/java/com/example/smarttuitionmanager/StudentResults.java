@@ -1,100 +1,166 @@
 package com.example.smarttuitionmanager;
 
+import android.database.Cursor;
 import android.os.Bundle;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.Spinner;
+import android.widget.*;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import java.util.ArrayList;
+
 public class StudentResults extends Fragment {
 
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    private Spinner spinnerStudent, spinnerSubject;
+    private Button btnViewResults;
+    private LinearLayout resultsContainer;
+    private MyDatabaseHelper dbHelper;
 
-    private String mParam1;
-    private String mParam2;
+    private ArrayList<Integer> studentIdsList = new ArrayList<>();
+    private ArrayList<Integer> subjectIdsList = new ArrayList<>();
 
-    private Spinner spinnerCourse;
-    private Spinner spinnerName;
-    private Button btnUpload;
+    private static final String TAG = "StudentResults";
 
-    public StudentResults() {
-        // Required empty public constructor
-    }
-
-    public static StudentResults newInstance(String param1, String param2) {
-        StudentResults fragment = new StudentResults();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
+    public StudentResults() {}
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_student_results, container, false);
+        View view = inflater.inflate(R.layout.fragment_student_results, container, false);
+
+        dbHelper = new MyDatabaseHelper(requireContext());
+
+        // ✅ Spinner & View Bindings
+        spinnerStudent = view.findViewById(R.id.spinner_students);
+        spinnerSubject = view.findViewById(R.id.spinner_course); // ✅ You missed this before!
+        btnViewResults = view.findViewById(R.id.btn_view);
+        resultsContainer = view.findViewById(R.id.results_list_layout);
+
+        loadStudentsIntoSpinner();
+        loadSubjectsIntoSpinner();
+
+        btnViewResults.setOnClickListener(v -> showResults());
+
+        // ✅ Top Navigation Button Handling
+        Button btnassignments = view.findViewById(R.id.assignments);
+        Button btncourseMaterials = view.findViewById(R.id.Cmaterial);
+        Button btnResults = view.findViewById(R.id.results);
+
+        btnassignments.setOnClickListener(v -> {
+            Fragment StudentAssignmentFragment = new StudentAssignment(); // or StudentAssignment
+            FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
+            transaction.replace(R.id.fragment_container, StudentAssignmentFragment );
+            transaction.addToBackStack(null);
+            transaction.commit();
+        });
+
+        btncourseMaterials.setOnClickListener(v -> {
+            Fragment StudentCourseGuideFragment = new StudentCourseGuide(); // or StudentCourseGuide
+            FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
+            transaction.replace(R.id.fragment_container, StudentCourseGuideFragment);
+            transaction.addToBackStack(null);
+            transaction.commit();
+        });
+
+        btnResults.setOnClickListener(v -> {
+            Toast.makeText(getContext(), "You are already on the Results page", Toast.LENGTH_SHORT).show();
+        });
+
+        return view;
     }
 
-    @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+    private void loadStudentsIntoSpinner() {
+        Cursor cursor = dbHelper.getAllStudents();
+        ArrayList<String> studentNames = new ArrayList<>();
+        studentIdsList.clear();
 
-        spinnerCourse = view.findViewById(R.id.spinner_course);
-    //    spinnerName = view.findViewById(R.id.spinner_name);
-        btnUpload = view.findViewById(R.id.btn_upload);
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                int id = cursor.getInt(cursor.getColumnIndexOrThrow("s_id"));
+                String firstName = cursor.getString(cursor.getColumnIndexOrThrow("first_name"));
+                String lastName = cursor.getString(cursor.getColumnIndexOrThrow("last_name"));
+                studentNames.add(firstName + " " + lastName);
+                studentIdsList.add(id);
+            } while (cursor.moveToNext());
+            cursor.close();
+        }
 
-        Button cmaterialBtn = view.findViewById(R.id.Cmaterial);
-        Button assignmentBtn = view.findViewById(R.id.assignments);
-        Button resultsBtn = view.findViewById(R.id.results); // Already in this fragment
-
-        // Upload button action
-        btnUpload.setOnClickListener(v -> {
-            // TODO: Save result to database or show a message
-        });
-
-        // Navigation: Course Materials
-        cmaterialBtn.setOnClickListener(v -> {
-            Fragment studentCourseGuideFragment = new StudentCourseGuide();
-            FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
-            transaction.replace(R.id.fragment_container, studentCourseGuideFragment);
-            transaction.addToBackStack(null);
-            transaction.commit();
-        });
-
-        // Navigation: Assignments
-        assignmentBtn.setOnClickListener(v -> {
-            Fragment studentAssignmentFragment = new StudentAssignment();
-            FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
-            transaction.replace(R.id.fragment_container, studentAssignmentFragment);
-            transaction.addToBackStack(null);
-            transaction.commit();
-        });
-
-        // Clicking "Results" does nothing because you're already here
-        resultsBtn.setOnClickListener(v -> {
-            // Optional: Show a message or refresh the page
-        });
-
-        // Load spinner data
-        loadSubjectsIntoSpinner();
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, studentNames);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerStudent.setAdapter(adapter);
     }
 
     private void loadSubjectsIntoSpinner() {
-        // TODO: Populate both spinnerCourse and spinnerName
+        Cursor cursor = dbHelper.getAllSubjects();
+        ArrayList<String> subjectNames = new ArrayList<>();
+        subjectIdsList.clear();
+
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                int id = cursor.getInt(cursor.getColumnIndexOrThrow("subject_id"));
+                String name = cursor.getString(cursor.getColumnIndexOrThrow("name"));
+                subjectNames.add(name);
+                subjectIdsList.add(id);
+            } while (cursor.moveToNext());
+            cursor.close();
+        }
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, subjectNames);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerSubject.setAdapter(adapter);
+    }
+
+    private void showResults() {
+        resultsContainer.removeAllViews();
+
+        if (studentIdsList.isEmpty() || subjectIdsList.isEmpty()) {
+            Toast.makeText(getContext(), "Please select both student and subject.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        int studentId = studentIdsList.get(spinnerStudent.getSelectedItemPosition());
+        int subjectId = subjectIdsList.get(spinnerSubject.getSelectedItemPosition());
+
+        Cursor cursor = null;
+        try {
+            cursor = dbHelper.getResultsByStudentAndSubject(studentId, subjectId);
+
+            if (cursor != null && cursor.moveToFirst()) {
+                do {
+                    String studentName = cursor.getString(cursor.getColumnIndexOrThrow("Name"));
+                    String subjectName = cursor.getString(cursor.getColumnIndexOrThrow("Subject_name"));
+                    int marks = cursor.getInt(cursor.getColumnIndexOrThrow("marks"));
+                    String remark = cursor.getString(cursor.getColumnIndexOrThrow("remark"));
+
+                    TextView resultView = new TextView(requireContext());
+                    resultView.setText(
+                            "Student: " + studentName + "\n" +
+                                    "Subject: " + subjectName + "\n" +
+                                    "Marks: " + marks + "\n" +
+                                    "Remark: " + (TextUtils.isEmpty(remark) ? "-" : remark) + "\n" +
+                                    "------------------------"
+                    );
+                    resultView.setPadding(10, 10, 10, 10);
+                    resultsContainer.addView(resultView);
+                } while (cursor.moveToNext());
+            } else {
+                TextView noResult = new TextView(requireContext());
+                noResult.setText("No results found for the selected student and subject.");
+                noResult.setPadding(10, 10, 10, 10);
+                resultsContainer.addView(noResult);
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error showing results: " + e.getMessage(), e);
+            Toast.makeText(getContext(), "Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
     }
 }

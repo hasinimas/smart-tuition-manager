@@ -1,6 +1,15 @@
 package com.example.smarttuitionmanager;
 
+import android.app.Activity;
+import android.content.ContentValues;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.Bundle;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,11 +29,19 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import android.provider.OpenableColumns;
+import android.util.Log;
+import android.view.*;
+import android.widget.*;
 
+
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
-public class TeacherAssignment extends Fragment {
+import java.io.*;
+import java.util.ArrayList;
+
 
     private EditText editTextTitle;
     private TextView textSelectedFile;
@@ -34,24 +51,51 @@ public class TeacherAssignment extends Fragment {
 
     private Uri selectedPdfUri;
 
-    public TeacherAssignment() {
-        // Required empty public constructor
+public class TeacherAssignment extends Fragment {
+    private Spinner spinnerCourse;
+    private EditText editTextTitle;
+    private TextView textSelectedFile;
+    private Uri selectedPdfUri;
+    private int selectedSubjectId = -1;
+    private MyDatabaseHelper dbHelper;
+    private long loggedInTeacherId = -1;
+
+    private static final String PREF_NAME = "LoginPrefs";
+    private static final String KEY_TEACHER_ID = "teacherId";
+    private static final int PICK_PDF_REQUEST = 100;
+    private static final String TAG = "TeacherAssignment";
+
+    private ArrayList<String> subjectNames;
+    private ArrayList<Integer> subjectIdsList;
+
+    public TeacherAssignment() {}
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        dbHelper = new MyDatabaseHelper(requireContext());
+
+        SharedPreferences sharedPreferences = requireContext().getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        loggedInTeacherId = sharedPreferences.getLong(KEY_TEACHER_ID, -1);
+        Log.d(TAG, "Retrieved teacher ID: " + loggedInTeacherId);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the correct layout file for this fragment
         View view = inflater.inflate(R.layout.fragment_teacher_assignment, container, false);
+
 
         // Initialize views
         textTeacherSubject = view.findViewById(R.id.text_teacher_subject);
+
         editTextTitle = view.findViewById(R.id.editText_title);
         textSelectedFile = view.findViewById(R.id.text_selected_file);
         Button btnSelectPdf = view.findViewById(R.id.btn_select_pdf);
         Button btnUpload = view.findViewById(R.id.btn_upload);
-        Button courseBtn = view.findViewById(R.id.Cmaterial);
+        Button CmaterialBtn = view.findViewById(R.id.Cmaterial);
         Button resultsBtn = view.findViewById(R.id.results);
+
         dbHelper = new MyDatabaseHelper(getContext());
 
         // Show logged-in teacher's subject
@@ -82,10 +126,11 @@ public class TeacherAssignment extends Fragment {
                     Log.d("TeacherAssignment", "Selected PDF: " + fileName + ", URI: " + selectedPdfUri);
                 }
             }
+
         });
 
-        btnSelectPdf.setOnClickListener(v -> selectPdfFromDevice());
         btnUpload.setOnClickListener(v -> uploadMaterial());
+
 
         // Navigate to TeacherCourseGuide fragment on course button click
         courseBtn.setOnClickListener(v -> {
@@ -94,19 +139,19 @@ public class TeacherAssignment extends Fragment {
             transaction.replace(R.id.fragment_container, teacherCourseGuide);
             transaction.addToBackStack(null);
             transaction.commit();
+
         });
 
-        // Navigate to TeacherResults fragment on results button click
         resultsBtn.setOnClickListener(v -> {
-            Fragment teacherResultsFragment = new TeacherResults();
             FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
-            transaction.replace(R.id.fragment_container, teacherResultsFragment);
+            transaction.replace(R.id.fragment_container, new TeacherResults()); // ✅ use correct container ID
             transaction.addToBackStack(null);
             transaction.commit();
         });
 
         return view;
     }
+
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -142,11 +187,13 @@ public class TeacherAssignment extends Fragment {
             Log.e("TeacherAssignment", "Error getting file name: " + e.getMessage(), e);
         } finally {
             if (cursor != null) cursor.close();
+
         }
         return result;
     }
 
     private void uploadMaterial() {
+
         String title = editTextTitle.getText().toString().trim();
 
         if (teacherSubject.isEmpty()) {
@@ -231,5 +278,6 @@ public class TeacherAssignment extends Fragment {
             Log.e("TeacherAssignment", "Error saving PDF to internal storage: " + e.getMessage(), e);
             return null;
         }
+
     }
 }

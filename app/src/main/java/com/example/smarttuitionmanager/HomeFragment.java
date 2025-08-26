@@ -70,6 +70,7 @@ public class HomeFragment extends Fragment {
     private void loadStudentContent() {
         setWelcome("Welcome, Student, Track your progress");
 
+
         // Real stats - using correct table names
         int subjectCount = getCount("SELECT COUNT(*) FROM student_subject WHERE student_id = ?", new String[]{String.valueOf(userId)});
         int assignmentCount = getCount("SELECT COUNT(*) FROM ASSIGNMENTS WHERE Subject_id IN (SELECT subject_id FROM student_subject WHERE student_id = ?)", new String[]{String.valueOf(userId)});
@@ -119,6 +120,7 @@ public class HomeFragment extends Fragment {
         addActionCard(R.drawable.ic_approval, "Approvals");
         addActionCard(R.drawable.ic_fees, "Fees Report");
 
+        layoutExtra.removeAllViews();
         addClassCard("System Health", "All Modules Active", "24x7", "Now");
         addClassCard("Backup Scheduled", "Weekly Backup", "Sun 2 AM", "Upcoming");
         addClassCard("Today’s Tasks", "Review Fee Logs", "3 Pending", "Now");
@@ -153,8 +155,9 @@ public class HomeFragment extends Fragment {
         }
     }
 
-    // --------------------- UI Builders ---------------------
+    // --------------------- UI Methods ---------------------
     private void setWelcome(String title) {
+
         layoutWelcome.removeAllViews();
         TextView welcomeText = new TextView(getContext());
         welcomeText.setText(title);
@@ -216,6 +219,7 @@ public class HomeFragment extends Fragment {
         ((TextView) card.findViewById(R.id.stat_count)).setText(count);
         ((TextView) card.findViewById(R.id.stat_title)).setText(title);
         layoutStats.addView(card);
+
     }
 
     private void addActionCard(int iconRes, String label) {
@@ -225,6 +229,7 @@ public class HomeFragment extends Fragment {
         if (iconView != null) {
             iconView.setImageResource(iconRes);
         }
+
         
         // Add click listener for navigation
         card.setOnClickListener(new View.OnClickListener() {
@@ -234,7 +239,15 @@ public class HomeFragment extends Fragment {
             }
         });
         
+
         layoutActions.addView(card);
+    }
+
+    private void addStatCard(String count, String title) {
+        View card = LayoutInflater.from(getContext()).inflate(R.layout.card_stat, layoutStats, false);
+        ((TextView) card.findViewById(R.id.stat_count)).setText(count);
+        ((TextView) card.findViewById(R.id.stat_title)).setText(title);
+        layoutStats.addView(card);
     }
 
     private void addClassCard(String subject, String grade, String time, String status) {
@@ -248,6 +261,7 @@ public class HomeFragment extends Fragment {
 
     private int getCount(String query, String[] args) {
         try {
+
         Cursor cursor = dbHelper.getReadableDatabase().rawQuery(query, args);
         int count = 0;
             if (cursor != null && cursor.moveToFirst()) {
@@ -316,6 +330,7 @@ public class HomeFragment extends Fragment {
                 android.widget.Toast.makeText(getContext(), "Error loading " + actionLabel, android.widget.Toast.LENGTH_SHORT).show();
             }
         }
+
     }
 
     // --------------------- Data Models ---------------------

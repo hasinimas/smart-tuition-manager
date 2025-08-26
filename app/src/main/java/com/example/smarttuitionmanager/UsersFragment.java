@@ -250,47 +250,47 @@ public class UsersFragment extends Fragment {
                             // Insert into database
                             MyDatabaseHelper dbHelper = new MyDatabaseHelper(getContext());
                             long result = dbHelper.insertTeacher(
-                                etFirstName.getText().toString().trim(),
-                                etLastName.getText().toString().trim(),
-                                etSubject.getText().toString().trim(),
-                                etPhone.getText().toString().trim(),
-                                etClass.getText().toString().trim(),
-                                etIdNumber.getText().toString().trim(),
-                                etEmail.getText().toString().trim(),
-                                etPassword.getText().toString().trim()
+                                    etFirstName.getText().toString().trim(),
+                                    etLastName.getText().toString().trim(),
+                                    etSubject.getText().toString().trim(),
+                                    etPhone.getText().toString().trim(),
+                                    etClass.getText().toString().trim(),
+                                    etIdNumber.getText().toString().trim(),
+                                    etEmail.getText().toString().trim(),
+                                    etPassword.getText().toString().trim()
                             );
 
                             if (result != -1) {
                                 // Animate success (scale and fade)
                                 v.setEnabled(false);
                                 v.animate()
-                                    .scaleX(1.2f).scaleY(1.2f).alpha(0.7f)
-                                    .setDuration(250)
-                                    .withEndAction(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            v.animate()
-                                                .scaleX(1f).scaleY(1f).alpha(1f)
-                                                .setDuration(250)
-                                                .withEndAction(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        Toast.makeText(getContext(), "Teacher submitted!", Toast.LENGTH_SHORT).show();
-                                                        dialog.dismiss();
-                                                        // Show teacher tab and list after adding a teacher
-                                                        headerTeachers.setVisibility(View.VISIBLE);
-                                                        headerStudents.setVisibility(View.GONE);
-                                                        recyclerTeachers.setVisibility(View.VISIBLE);
-                                                        recyclerStudents.setVisibility(View.GONE);
-                                                        tabTeachers.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.tab_selected_bg));
-                                                        tabTeachers.setTextColor(ContextCompat.getColor(getContext(), R.color.primary));
-                                                        tabStudents.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.background_white));
-                                                        tabStudents.setTextColor(ContextCompat.getColor(getContext(), R.color.text_secondary));
-                                                        showTeacherList();
-                                                    }
-                                                }).start();
-                                        }
-                                    }).start();
+                                        .scaleX(1.2f).scaleY(1.2f).alpha(0.7f)
+                                        .setDuration(250)
+                                        .withEndAction(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                v.animate()
+                                                        .scaleX(1f).scaleY(1f).alpha(1f)
+                                                        .setDuration(250)
+                                                        .withEndAction(new Runnable() {
+                                                            @Override
+                                                            public void run() {
+                                                                Toast.makeText(getContext(), "Teacher submitted!", Toast.LENGTH_SHORT).show();
+                                                                dialog.dismiss();
+                                                                // Show teacher tab and list after adding a teacher
+                                                                headerTeachers.setVisibility(View.VISIBLE);
+                                                                headerStudents.setVisibility(View.GONE);
+                                                                recyclerTeachers.setVisibility(View.VISIBLE);
+                                                                recyclerStudents.setVisibility(View.GONE);
+                                                                tabTeachers.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.tab_selected_bg));
+                                                                tabTeachers.setTextColor(ContextCompat.getColor(getContext(), R.color.primary));
+                                                                tabStudents.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.background_white));
+                                                                tabStudents.setTextColor(ContextCompat.getColor(getContext(), R.color.text_secondary));
+                                                                showTeacherList();
+                                                            }
+                                                        }).start();
+                                            }
+                                        }).start();
                             } else {
                                 Toast.makeText(getContext(), "Failed to add teacher (maybe duplicate email)", Toast.LENGTH_SHORT).show();
                             }
@@ -394,14 +394,14 @@ public class UsersFragment extends Fragment {
                             // Insert student and subjects into DB
                             MyDatabaseHelper dbHelper = new MyDatabaseHelper(getContext());
                             long studentId = dbHelper.insertStudent(
-                                etFirstName.getText().toString().trim(),
-                                etLastName.getText().toString().trim(),
-                                etClass.getText().toString().trim(),
-                                etPhone.getText().toString().trim(),
-                                etGuardianTP.getText().toString().trim(),
-                                null, // qr_img, set to null or handle as needed
-                                etEmail.getText().toString().trim(),
-                                etPassword.getText().toString().trim()
+                                    etFirstName.getText().toString().trim(),
+                                    etLastName.getText().toString().trim(),
+                                    etClass.getText().toString().trim(),
+                                    etPhone.getText().toString().trim(),
+                                    etGuardianTP.getText().toString().trim(),
+                                    null, // qr_img, set to null or handle as needed
+                                    etEmail.getText().toString().trim(),
+                                    etPassword.getText().toString().trim()
                             );
 
                             //  Generate QR content (e.g., studentId or email)
@@ -430,39 +430,39 @@ public class UsersFragment extends Fragment {
                             // Animate success (scale and fade)
                             v.setEnabled(false);
                             v.animate()
-                                .scaleX(1.2f).scaleY(1.2f).alpha(0.7f)
-                                .setDuration(250)
-                                .withEndAction(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        v.animate()
-                                            .scaleX(1f).scaleY(1f).alpha(1f)
-                                            .setDuration(250)
-                                            .withEndAction(new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    Toast.makeText(getContext(), "Student submitted!", Toast.LENGTH_SHORT).show();
-                                                    dialog.dismiss();
-                                                    // Show QR dialog after student submit
-                                                    LayoutInflater qrInflater = LayoutInflater.from(getContext());
-                                                    View qrDialogView = qrInflater.inflate(R.layout.dialog_student_qr, null);
+                                    .scaleX(1.2f).scaleY(1.2f).alpha(0.7f)
+                                    .setDuration(250)
+                                    .withEndAction(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            v.animate()
+                                                    .scaleX(1f).scaleY(1f).alpha(1f)
+                                                    .setDuration(250)
+                                                    .withEndAction(new Runnable() {
+                                                        @Override
+                                                        public void run() {
+                                                            Toast.makeText(getContext(), "Student submitted!", Toast.LENGTH_SHORT).show();
+                                                            dialog.dismiss();
+                                                            // Show QR dialog after student submit
+                                                            LayoutInflater qrInflater = LayoutInflater.from(getContext());
+                                                            View qrDialogView = qrInflater.inflate(R.layout.dialog_student_qr, null);
 
-                                                    AlertDialog qrDialog = new AlertDialog.Builder(getContext())
-                                                            .setView(qrDialogView)
-                                                            .setCancelable(true)
-                                                            .create();
-                                                    qrDialog.show();
-                                                    Button btnSubmitQR = qrDialogView.findViewById(R.id.btn_submit_qr);
-                                                    btnSubmitQR.setOnClickListener(v1 -> {
-                                                        qrDialog.dismiss();
-                                                        onSubmitQRClicked(studentId);  //pass the student ID
-                                                    });
+                                                            AlertDialog qrDialog = new AlertDialog.Builder(getContext())
+                                                                    .setView(qrDialogView)
+                                                                    .setCancelable(true)
+                                                                    .create();
+                                                            qrDialog.show();
+                                                            Button btnSubmitQR = qrDialogView.findViewById(R.id.btn_submit_qr);
+                                                            btnSubmitQR.setOnClickListener(v1 -> {
+                                                                qrDialog.dismiss();
+                                                                onSubmitQRClicked(studentId);  //pass the student ID
+                                                            });
 
 
-                                                }
-                                            }).start();
-                                    }
-                                }).start();
+                                                        }
+                                                    }).start();
+                                        }
+                                    }).start();
                         }
                     });
 
@@ -561,17 +561,17 @@ public class UsersFragment extends Fragment {
         // Delete logic
         dialogView.findViewById(R.id.btn_delete_teacher_report).setOnClickListener(v -> {
             new AlertDialog.Builder(getContext())
-                .setTitle("Delete Teacher")
-                .setMessage("Are you sure you want to delete this teacher?")
-                .setPositiveButton("Delete", (d, which) -> {
-                    MyDatabaseHelper dbHelper = new MyDatabaseHelper(getContext());
-                    dbHelper.deleteTeacher(teacher.tId);
-                    dialog.dismiss();
-                    showTeacherList();
-                    Toast.makeText(getContext(), "Teacher deleted", Toast.LENGTH_SHORT).show();
-                })
-                .setNegativeButton("Cancel", null)
-                .show();
+                    .setTitle("Delete Teacher")
+                    .setMessage("Are you sure you want to delete this teacher?")
+                    .setPositiveButton("Delete", (d, which) -> {
+                        MyDatabaseHelper dbHelper = new MyDatabaseHelper(getContext());
+                        dbHelper.deleteTeacher(teacher.tId);
+                        dialog.dismiss();
+                        showTeacherList();
+                        Toast.makeText(getContext(), "Teacher deleted", Toast.LENGTH_SHORT).show();
+                    })
+                    .setNegativeButton("Cancel", null)
+                    .show();
         });
 
         // Update logic
@@ -664,15 +664,15 @@ public class UsersFragment extends Fragment {
 
             MyDatabaseHelper dbHelper = new MyDatabaseHelper(getContext());
             dbHelper.updateTeacher(
-                teacher.tId,
-                etFirstName.getText().toString().trim(),
-                etLastName.getText().toString().trim(),
-                etSubject.getText().toString().trim(),
-                etPhone.getText().toString().trim(),
-                etClass.getText().toString().trim(),
-                etIdNumber.getText().toString().trim(),
-                etEmail.getText().toString().trim(),
-                etPassword.getText().toString().trim()
+                    teacher.tId,
+                    etFirstName.getText().toString().trim(),
+                    etLastName.getText().toString().trim(),
+                    etSubject.getText().toString().trim(),
+                    etPhone.getText().toString().trim(),
+                    etClass.getText().toString().trim(),
+                    etIdNumber.getText().toString().trim(),
+                    etEmail.getText().toString().trim(),
+                    etPassword.getText().toString().trim()
             );
             dialog.dismiss();
             showTeacherList();

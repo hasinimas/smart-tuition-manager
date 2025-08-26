@@ -2,20 +2,28 @@ package com.example.smarttuitionmanager;
 
 import android.app.Activity;
 import android.content.ContentValues;
-import android.content.Context; // Import Context for SharedPreferences
+import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences; // Import SharedPreferences
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.OpenableColumns;
-import android.util.Log; // Import Log for debugging
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.Nullable;
@@ -30,7 +38,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-// ... (all imports remain unchanged)
 
 public class TeacherCourseGuide extends Fragment {
 
@@ -43,43 +50,50 @@ public class TeacherCourseGuide extends Fragment {
     private long loggedInTeacherId = -1;
 
     private static final String PREF_NAME = "LoginPrefs";
-    private static final String KEY_TEACHER_ID = "teacherId"; // this is t_id
+    private static final String KEY_TEACHER_ID = "teacherId";
 
-    public TeacherCourseGuide() {}
+    private static final int PICK_PDF_REQUEST = 100;
+    private static final String TAG = "TeacherCourseGuide";
 
-    public static TeacherCourseGuide newInstance(String param1, String param2) {
-        TeacherCourseGuide fragment = new TeacherCourseGuide();
-        Bundle args = new Bundle();
-        fragment.setArguments(args);
-        return fragment;
+
+    private ArrayList<String> subjectNames;
+    private ArrayList<Integer> subjectIdsList;
+
+
+
+    public TeacherCourseGuide() {
+        // Required empty public constructor
     }
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        dbHelper = new MyDatabaseHelper(getContext());
+        dbHelper = new MyDatabaseHelper(requireContext());
 
-        SharedPreferences sharedPreferences = getContext().getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
-        loggedInTeacherId = sharedPreferences.getLong(KEY_TEACHER_ID, -1L);
-        Log.d("TeacherCourseGuide", "Retrieved t_id: " + loggedInTeacherId);
-
-        if (loggedInTeacherId == -1) {
-            Toast.makeText(getContext(), "Error: Teacher ID not found. Please log in.", Toast.LENGTH_LONG).show();
-        }
+        // Get teacher ID from shared preferences
+        SharedPreferences sharedPreferences = requireContext().getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        loggedInTeacherId = sharedPreferences.getLong(KEY_TEACHER_ID, -1);
+        Log.d(TAG, "Retrieved teacher ID: " + loggedInTeacherId);
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_teacher_course_guide, container, false);
 
+
         textTeacherSubject = view.findViewById(R.id.text_teacher_subject);
+
+        // Initialize views
+     //   spinnerCourse = view.findViewById(R.id.spinner_course);
+
         editTextTitle = view.findViewById(R.id.editText_title);
         textSelectedFile = view.findViewById(R.id.text_selected_file);
         Button btnSelectPdf = view.findViewById(R.id.btn_select_pdf);
         Button btnUpload = view.findViewById(R.id.btn_upload);
         Button assignmentsBtn = view.findViewById(R.id.assignments);
         Button resultsBtn = view.findViewById(R.id.results);
+
 
         if (loggedInTeacherId != -1) {
             loadTeacherSubject();
@@ -88,27 +102,67 @@ public class TeacherCourseGuide extends Fragment {
             textTeacherSubject.setText("Error: Teacher not found");
         }
 
-        btnSelectPdf.setOnClickListener(v -> selectPdfFromDevice());
-        btnUpload.setOnClickListener(v -> uploadMaterial());
 
+        // Load all available subjects into spinner
+        loadAllSubjects();
+
+        // Set up spinner
+        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(
+                requireContext(),
+                android.R.layout.simple_spinner_item,
+                subjectNames
+        );
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerCourse.setAdapter(spinnerAdapter);
+
+        // Spinner item selection listener
+        spinnerCourse.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (position >= 0 && position < subjectIdsList.size()) {
+                    selectedSubjectId = subjectIdsList.get(position);
+                    String selectedSubject = subjectNames.get(position);
+                    Log.d(TAG, "Selected subject: " + selectedSubject + " (ID: " + selectedSubjectId + ")");
+                    Toast.makeText(requireContext(), "Selected: " + selectedSubject, Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                selectedSubjectId = -1;
+            }
+        });
+
+        // PDF selection button
+        btnSelectPdf.setOnClickListener(v -> {
+            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+            intent.setType("application/pdf");
+            startActivityForResult(intent, PICK_PDF_REQUEST);
+        });
+
+        // Upload button
+        btnUpload.setOnClickListener(v -> {
+            uploadMaterial();
+        });
+
+        // Navigation buttons
         assignmentsBtn.setOnClickListener(v -> {
-            Fragment teacherAssignmentFragment = new TeacherAssignment();
             FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
-            transaction.replace(R.id.fragment_container, teacherAssignmentFragment);
+            transaction.replace(R.id.frame_layout_teacher, new TeacherAssignment());
             transaction.addToBackStack(null);
             transaction.commit();
         });
 
         resultsBtn.setOnClickListener(v -> {
-            Fragment teacherResultsFragment = new TeacherResults();
             FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
-            transaction.replace(R.id.fragment_container, teacherResultsFragment);
+            transaction.replace(R.id.frame_layout_teacher, new TeacherResults());
             transaction.addToBackStack(null);
             transaction.commit();
         });
 
         return view;
     }
+
 
     private void loadTeacherSubject() {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
@@ -141,62 +195,66 @@ public class TeacherCourseGuide extends Fragment {
         intent.setType("application/pdf");
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         startActivityForResult(intent, 100);
+
+
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 100 && resultCode == Activity.RESULT_OK && data != null) {
+
+        if (requestCode == PICK_PDF_REQUEST && resultCode == Activity.RESULT_OK && data != null) {
+
             selectedPdfUri = data.getData();
             String fileName = getFileName(selectedPdfUri);
             textSelectedFile.setText(fileName);
-            Log.d("TeacherCourseGuide", "Selected PDF: " + fileName + ", URI: " + selectedPdfUri);
+            Log.d(TAG, "Selected PDF: " + fileName);
         }
     }
 
     private String getFileName(Uri uri) {
         String result = null;
-        Cursor cursor = null;
-        try {
-            cursor = getContext().getContentResolver().query(uri, null, null, null, null);
-            if (cursor != null && cursor.moveToFirst()) {
-                int nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
-                if (nameIndex != -1) {
-                    result = cursor.getString(nameIndex);
+        if (uri.getScheme().equals("content")) {
+            try (Cursor cursor = requireContext().getContentResolver().query(uri, null, null, null, null)) {
+                if (cursor != null && cursor.moveToFirst()) {
+                    result = cursor.getString(cursor.getColumnIndexOrThrow(OpenableColumns.DISPLAY_NAME));
                 }
             }
-        } catch (Exception e) {
-            Log.e("TeacherCourseGuide", "Error getting file name: " + e.getMessage(), e);
-        } finally {
-            if (cursor != null) cursor.close();
+        }
+        if (result == null) {
+            result = uri.getPath();
+            int cut = result.lastIndexOf('/');
+            if (cut != -1) {
+                result = result.substring(cut + 1);
+            }
         }
         return result;
     }
 
     private void uploadMaterial() {
-        String title = editTextTitle.getText().toString().trim();
+        try {
+            // Get the PDF file as bytes
+            InputStream inputStream = requireContext().getContentResolver().openInputStream(selectedPdfUri);
+            byte[] pdfBytes = new byte[inputStream.available()];
+            inputStream.read(pdfBytes);
+            inputStream.close();
+
 
         if (teacherSubject.isEmpty()) {
             Toast.makeText(getContext(), "No subject assigned to teacher.", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        if (title.isEmpty()) {
-            Toast.makeText(getContext(), "Please enter a title for the material.", Toast.LENGTH_SHORT).show();
-            return;
-        }
 
-        String filePath = null;
-        if (selectedPdfUri != null) {
-            filePath = savePdfToInternalStorage(selectedPdfUri, title);
-            if (filePath == null) {
-                Toast.makeText(getContext(), "File saving failed", Toast.LENGTH_SHORT).show();
-                return;
-            }
-        } else {
-            Toast.makeText(getContext(), "Please select a PDF file to upload.", Toast.LENGTH_SHORT).show();
-            return;
-        }
+            // Save to database
+            String title = editTextTitle.getText().toString().trim();
+            String filePath = file.getAbsolutePath();
+
+            SQLiteDatabase db = dbHelper.getWritableDatabase();
+            ContentValues values = new ContentValues();
+            values.put("Subject_id", selectedSubjectId);
+            values.put("title", title);
+            values.put("file_path", filePath);
 
         // Get the subject ID for the teacher's subject
         SQLiteDatabase db = dbHelper.getWritableDatabase();
@@ -230,26 +288,26 @@ public class TeacherCourseGuide extends Fragment {
         }
     }
 
-    private String savePdfToInternalStorage(Uri uri, String title) {
-        try {
-            InputStream inputStream = getContext().getContentResolver().openInputStream(uri);
-            File dir = new File(getContext().getFilesDir(), "materials");
-            if (!dir.exists()) dir.mkdirs();
-            File file = new File(dir, title.replaceAll("[^a-zA-Z0-9.-]", "_") + ".pdf");
-            OutputStream outputStream = new FileOutputStream(file);
 
-            byte[] buffer = new byte[1024];
-            int length;
-            while ((length = inputStream.read(buffer)) > 0) {
-                outputStream.write(buffer, 0, length);
+            if (result != -1) {
+                Toast.makeText(requireContext(), "Material uploaded successfully", Toast.LENGTH_SHORT).show();
+                resetForm();
+            } else {
+                Toast.makeText(requireContext(), "Failed to upload material", Toast.LENGTH_SHORT).show();
+
             }
-
-            outputStream.close();
-            inputStream.close();
-            return file.getAbsolutePath();
         } catch (Exception e) {
-            Log.e("TeacherCourseGuide", "Error saving PDF to internal storage: " + e.getMessage(), e);
-            return null;
+            Log.e(TAG, "Error uploading material: " + e.getMessage());
+            Toast.makeText(requireContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
+
+
+    private void resetForm() {
+        editTextTitle.setText("");
+        textSelectedFile.setText("No file selected");
+        selectedPdfUri = null;
+        spinnerCourse.setSelection(0);
+    }
 }
+

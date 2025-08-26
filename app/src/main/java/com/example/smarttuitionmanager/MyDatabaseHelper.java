@@ -236,15 +236,46 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
         
 
 
+        //  Attendance table
+        db.execSQL("CREATE TABLE ATTENDANCE (" +
+                "attendance_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "student_id INTEGER NOT NULL, " +
+                "subject_id INTEGER NOT NULL, " +
+                "date TEXT NOT NULL, " +
+                "status TEXT CHECK(status IN ('Present','Absent')) NOT NULL, " +
+                "FOREIGN KEY(student_id) REFERENCES student(s_id), " +
+                "FOREIGN KEY(subject_id) REFERENCES subject(subject_id))");
+
+        // Notifications table
+        db.execSQL("CREATE TABLE NOTIFICATIONS (" +
+                "notification_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "student_id INTEGER NOT NULL, " +
+                "message TEXT NOT NULL, " +
+                "timestamp TEXT NOT NULL, " +
+                "FOREIGN KEY(student_id) REFERENCES student(s_id))");
+
     }
 
 
         @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+
+
+        db.execSQL("DROP TABLE IF EXISTS student");
+        db.execSQL("DROP TABLE IF EXISTS teacher");
+        db.execSQL("DROP TABLE IF EXISTS subject");
+        db.execSQL("DROP TABLE IF EXISTS student_subject");
+        db.execSQL("DROP TABLE IF EXISTS RESULTS");
+        db.execSQL("DROP TABLE IF EXISTS Subject_MATERIALS");
+        db.execSQL("DROP TABLE IF EXISTS ASSIGNMENTS");
+        onCreate(db);
+
+
         if (oldVersion < 3) {
             db.execSQL("CREATE TABLE IF NOT EXISTS admin (admin_id INTEGER PRIMARY KEY AUTOINCREMENT, first_name TEXT NOT NULL, last_name TEXT NOT NULL, email TEXT UNIQUE NOT NULL, password TEXT NOT NULL)");
             db.execSQL("INSERT OR IGNORE INTO admin (first_name, last_name, email, password) VALUES ('new', 'admin', 'admin@gmail.com', 'admin123')");
         }
+
         if (oldVersion < 5) {
             // Create teacher student assign table
             db.execSQL("CREATE TABLE IF NOT EXISTS teacher_student_assign (" +
@@ -272,6 +303,7 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
                     "FOREIGN KEY(student_id) REFERENCES student(s_id), " +
                     "FOREIGN KEY(subject_id) REFERENCES subject(subject_id))");
         }
+
     }
 
     // Insert a student and return the new student ID
@@ -350,7 +382,8 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         return db.rawQuery("SELECT * FROM subject", null);
     }
-    // ✅ Insert a result
+    // TEACHER SIDE
+    // Insert a result
     public boolean insertResult(int studentId, int subjectId, int marks, String remark) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -361,7 +394,7 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
         long result = db.insert("RESULTS", null, values);
         return result != -1;
     }
-    // ✅ Get subjects assigned to a specific teacher
+    //  Get subjects assigned to a specific teacher
     public Cursor getSubjectsByTeacherId(long teacherId) {
         SQLiteDatabase db = this.getReadableDatabase();
         String query = "SELECT * FROM subject WHERE t_id = ?";
@@ -434,7 +467,7 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
         return updatedRows > 0;
     }
 
-    // ✅ Get all results
+    //  Get all results
     public Cursor getAllResults() {
         SQLiteDatabase db = this.getReadableDatabase();
         String query = "SELECT s.first_name || ' ' || s.last_name AS Name, " +
@@ -444,8 +477,20 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
                 "JOIN subject sub ON r.Subject_id = sub.subject_id";
         return db.rawQuery(query, null);
     }
+    //  Get results by specific student and subject
+    public Cursor getResultsByStudentAndSubject(int studentId, int subjectId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT s.first_name || ' ' || s.last_name AS Name, " +
+                "sub.name AS Subject_name, r.marks, r.remark " +
+                "FROM RESULTS r " +
+                "JOIN student s ON r.student_id = s.s_id " +
+                "JOIN subject sub ON r.Subject_id = sub.subject_id " +
+                "WHERE r.student_id = ? AND r.Subject_id = ?";
+        return db.rawQuery(query, new String[]{String.valueOf(studentId), String.valueOf(subjectId)});
+    }
 
-   // Check if a student exists with given email and password
+
+    // Check if a student exists with given email and password
     public boolean checkStudentLogin(String email, String password) {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery("SELECT s_id FROM student WHERE email=? AND password=?", new String[]{email, password});
@@ -741,7 +786,36 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
+
     // -------------------------------------------- Teacher Student Assign Methods ---------------------------------------------------------------
+
+    /*public boolean markAttendance(int studentId, int subjectId, String date, String status) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // Check if already marked
+        Cursor cursor = db.rawQuery(
+                "SELECT * FROM attendance WHERE student_id = ? AND subject_id = ? AND date = ?",
+                new String[]{String.valueOf(studentId), String.valueOf(subjectId), date});
+
+        boolean alreadyMarked = cursor.moveToFirst();
+        cursor.close();
+
+        if (alreadyMarked) {
+            return false; // Prevent duplicate entry
+        }
+
+        // Insert new attendance
+        ContentValues values = new ContentValues();
+        values.put("student_id", studentId);
+        values.put("subject_id", subjectId);
+        values.put("date", date);
+        values.put("status", status);
+        long result = db.insert("attendance", null, values);
+
+        return result != -1;
+    }
+*/
+
 
     // Assign a teacher to a student with details
     public long assignTeacherToStudent(String teacherName, String studentName, String subject, String time, String grade, String day) {

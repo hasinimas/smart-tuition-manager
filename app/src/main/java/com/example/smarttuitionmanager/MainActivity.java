@@ -14,7 +14,7 @@ import androidx.fragment.app.Fragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity {
- MyDatabaseHelper mydb;
+    MyDatabaseHelper mydb;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -30,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
+
         // Load HomeFragment with user role from SharedPreferences
         if (savedInstanceState == null) {
             try {
@@ -43,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
                 bundle.putString("role", userRole);
 
                 homeFragment.setArguments(bundle);
+
 
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, homeFragment).commit();
             } catch (Exception e) {
@@ -71,6 +73,7 @@ public class MainActivity extends AppCompatActivity {
         bottomNav.setOnItemSelectedListener(item -> {
             Fragment selectedFragment = null;
             Bundle bundle = new Bundle();
+
             
             // Use the userRole variable from above
             bundle.putString("role", userRole);
@@ -117,6 +120,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                         break;
                 }
+
             }
 
             if (selectedFragment != null) {
@@ -130,6 +134,7 @@ public class MainActivity extends AppCompatActivity {
                     android.widget.Toast.makeText(this, "Error loading " + item.getTitle(), android.widget.Toast.LENGTH_SHORT).show();
                 }
             }
+
 
             return true;
         });
